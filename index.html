@@ -292,16 +292,20 @@
   </div>
 
   <!-- ===================================================================== -->
-  <!-- 2. LAYAR PEMUATAN AWAL                                                -->
+  <!-- 2. LAYAR PEMUATAN AWAL (ANTI-MACET MAKSIMAL 1.8 DETIK)                -->
   <!-- ===================================================================== -->
   <div id="loading-screen" class="no-print flex-1 flex flex-col items-center justify-center p-6 text-center">
     <div class="w-14 h-14 border-4 border-primary-200 border-t-primary-700 rounded-full animate-spin mb-4"></div>
     <h2 class="text-xl font-extrabold text-slate-900">Membuka Buku Jurnal PKL Terpadu...</h2>
-    <p class="text-base text-slate-600 mt-1">Menghubungkan sinkronisasi cloud lintas perangkat.</p>
+    <p class="text-base text-slate-600 mt-1">Menyiapkan penyimpanan data Anda secara otomatis.</p>
+    <button type="button" onclick="forceEnterLocalMode()"
+      class="mt-5 px-5 py-2.5 bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold text-sm rounded-xl transition cursor-pointer">
+      Buka Sekarang &rarr;
+    </button>
   </div>
 
   <!-- ===================================================================== -->
-  <!-- 3. LAYAR MASUK / DAFTAR AKUN (FIREBASE AUTH)                          -->
+  <!-- 3. LAYAR MASUK / DAFTAR AKUN (HANYA MUNCUL JIKA CLOUD FIREBASE AKTIF) -->
   <!-- ===================================================================== -->
   <div id="auth-screen" class="no-print hidden flex-1 flex items-center justify-center p-4 sm:p-6 bg-gradient-to-br from-primary-50 via-slate-50 to-navy-50">
     <div class="max-w-md w-full bg-white border-2 border-slate-200 rounded-3xl p-6 sm:p-8 shadow-xl">
@@ -322,7 +326,7 @@
         </div>
         <h1 class="text-2xl font-extrabold text-slate-900">Jurnal & Monitoring PKL</h1>
         <p class="text-sm text-slate-600 mt-1.5 leading-relaxed">
-          Catat kegiatan harian, foto dokumentasi, paraf pembimbing, hingga cetak laporan resmi dari <strong>HP maupun Laptop</strong>.
+          Masuk dengan akun Anda untuk sinkronisasi otomatis antar <strong>HP & Laptop</strong>, atau gunakan mode offline perangkat.
         </p>
       </div>
 
@@ -358,7 +362,7 @@
 
       <div class="relative my-5">
         <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-slate-300"></div></div>
-        <div class="relative flex justify-center text-xs"><span class="px-3 bg-white text-slate-500 font-bold">atau metode lain</span></div>
+        <div class="relative flex justify-center text-xs"><span class="px-3 bg-white text-slate-500 font-bold">atau pilihan cepat</span></div>
       </div>
 
       <div class="space-y-2.5">
@@ -373,9 +377,9 @@
           <span>Masuk dengan Akun Google</span>
         </button>
 
-        <button type="button" onclick="handleGuestLogin()"
-          class="w-full py-2.5 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs rounded-xl transition cursor-pointer">
-          Masuk Cepat Tanpa Daftar (Mode Demo / Satu Perangkat)
+        <button type="button" onclick="forceEnterLocalMode()"
+          class="w-full py-3 px-4 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs rounded-xl transition cursor-pointer">
+          📱 Gunakan Mode Penyimpanan Perangkat (Tanpa Login)
         </button>
       </div>
     </div>
@@ -391,7 +395,7 @@
       <div class="max-w-6xl mx-auto px-4 sm:px-6 py-3">
         <div class="flex flex-wrap items-center justify-between gap-3">
           
-          <!-- Brand & Status Cloud -->
+          <!-- Brand & Status Penyimpanan -->
           <div class="flex items-center gap-3 min-w-0">
             <div class="bg-primary-600 text-white p-2.5 rounded-xl shrink-0">
               <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
@@ -401,52 +405,54 @@
             <div class="min-w-0">
               <h1 class="text-base sm:text-lg font-extrabold tracking-tight truncate">Buku Jurnal & Monitoring PKL</h1>
               <div class="flex items-center gap-2 text-xs text-slate-300">
-                <span id="cloud-indicator-dot" class="w-2 h-2 rounded-full bg-emerald-400 shrink-0"></span>
-                <span id="user-account-label" class="truncate">Tersimpan di Cloud</span>
+                <span id="storage-indicator-dot" class="w-2 h-2 rounded-full bg-emerald-400 shrink-0"></span>
+                <span id="user-account-label" class="truncate">Mode Perangkat (Siap Pakai)</span>
               </div>
             </div>
           </div>
 
-          <!-- Pengatur Ukuran Huruf (Aksesibilitas Semua Usia) & Tombol Keluar -->
+          <!-- Pengatur Ukuran Huruf & Pengaturan Cloud -->
           <div class="flex flex-wrap items-center gap-2">
             <div class="flex items-center bg-slate-800 p-1 rounded-xl border border-slate-700" role="group" aria-label="Pengatur Ukuran Teks">
               <button type="button" onclick="setFontScale('normal')" data-scale-btn="normal"
                 class="scale-btn px-2.5 py-1.5 rounded-lg text-xs font-bold bg-primary-600 text-white transition cursor-pointer">
-                Teks Normal
+                Normal
               </button>
               <button type="button" onclick="setFontScale('large')" data-scale-btn="large"
                 class="scale-btn px-2.5 py-1.5 rounded-lg text-xs font-bold text-slate-300 hover:text-white transition cursor-pointer">
-                Teks Besar
+                Besar
               </button>
               <button type="button" onclick="setFontScale('xlarge')" data-scale-btn="xlarge"
                 class="scale-btn px-2.5 py-1.5 rounded-lg text-xs font-bold text-slate-300 hover:text-white transition cursor-pointer">
-                Teks Ekstra Besar
+                Ekstra Besar
               </button>
             </div>
 
-            <button type="button" onclick="handleLogout()"
-              class="inline-flex items-center gap-1.5 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold px-3 py-2 rounded-xl transition cursor-pointer">
-              <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-              </svg>
+            <button type="button" onclick="openCloudConfigModal()"
+              class="inline-flex items-center gap-1.5 bg-slate-800 hover:bg-slate-700 text-primary-200 border border-slate-600 text-xs font-bold px-3 py-2 rounded-xl transition cursor-pointer">
+              <span>☁️ Pengaturan Cloud</span>
+            </button>
+
+            <button type="button" id="btn-header-logout" onclick="handleLogout()"
+              class="hidden inline-flex items-center gap-1.5 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold px-3 py-2 rounded-xl transition cursor-pointer">
               <span>Keluar</span>
             </button>
           </div>
         </div>
 
-        <!-- NAVIGASI TAB DESKTOP (Tampil di layar menengah ke atas) -->
+        <!-- NAVIGASI TAB DESKTOP -->
         <nav aria-label="Menu Utama Desktop" class="hidden md:grid grid-cols-4 gap-2 mt-3 pt-3 border-t border-slate-800">
           <button type="button" onclick="switchTab('beranda')" data-tab-target="beranda"
             class="nav-tab-desktop flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl font-bold text-sm bg-primary-600 text-white transition cursor-pointer">
-            <span>🏠 1. Beranda & Input Jurnal</span>
+            <span>🏠 1. Dashboard & Input</span>
           </button>
           <button type="button" onclick="switchTab('riwayat')" data-tab-target="riwayat"
             class="nav-tab-desktop flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl font-bold text-sm text-slate-300 hover:bg-slate-800 transition cursor-pointer">
-            <span>📋 2. Riwayat Kegiatan (<span class="badge-total-count">0</span>)</span>
+            <span>📋 2. Riwayat & Paraf (<span class="badge-total-count">0</span>)</span>
           </button>
           <button type="button" onclick="switchTab('penilaian')" data-tab-target="penilaian"
             class="nav-tab-desktop flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl font-bold text-sm text-slate-300 hover:bg-slate-800 transition cursor-pointer">
-            <span>⭐ 3. Penilaian & Evaluasi</span>
+            <span>⭐ 3. Penilaian Akhir</span>
           </button>
           <button type="button" onclick="switchTab('profil')" data-tab-target="profil"
             class="nav-tab-desktop flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl font-bold text-sm text-slate-300 hover:bg-slate-800 transition cursor-pointer">
@@ -460,7 +466,7 @@
     <main class="max-w-6xl w-full mx-auto px-4 sm:px-6 py-6 space-y-6 flex-1">
 
       <!-- ================================================================= -->
-      <!-- TAB 1: BERANDA RINGKASAN & INPUT JURNAL HARIAN                    -->
+      <!-- TAB 1: DASHBOARD RINGKASAN & INPUT JURNAL HARIAN                  -->
       <!-- ================================================================= -->
       <div id="view-beranda" class="tab-view space-y-6">
 
@@ -732,7 +738,7 @@
           <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
             <div>
               <h3 class="text-lg font-extrabold text-slate-900">Catatan Terbaru Anda</h3>
-              <p class="text-xs text-slate-600">Menampilkan 3 catatan terakhir yang tersimpan di cloud</p>
+              <p class="text-xs text-slate-600">Menampilkan 3 catatan terakhir yang tersimpan</p>
             </div>
             <button type="button" onclick="switchTab('riwayat')"
               class="text-sm font-extrabold text-primary-700 hover:text-primary-900 underline cursor-pointer">
@@ -931,7 +937,7 @@
 
             <button type="submit"
               class="w-full flex items-center justify-center gap-2 bg-primary-700 hover:bg-primary-800 text-white font-extrabold text-lg py-4 px-6 rounded-2xl shadow-md transition cursor-pointer">
-              <span>💾 Simpan Penilaian Akhir ke Cloud</span>
+              <span>💾 Simpan Penilaian Akhir</span>
             </button>
           </form>
         </section>
@@ -944,10 +950,18 @@
         
         <!-- Kartu Cetak Laporan Resmi & Ekspor -->
         <section class="bg-gradient-to-br from-navy-900 to-slate-800 text-white rounded-3xl p-5 sm:p-7 shadow-md">
-          <h2 class="text-xl sm:text-2xl font-extrabold">Cetak Laporan Resmi & Cadangkan Data</h2>
-          <p class="text-sm text-slate-300 mt-1 leading-relaxed">
-            Susun otomatis dokumen laporan PKL siap jilid (Identitas, Rekap Kehadiran, Tabel Jurnal, Penilaian Akhir, & 3 Kolom Tanda Tangan) atau unduh berkas Excel & JSON.
-          </p>
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <h2 class="text-xl sm:text-2xl font-extrabold">Cetak Laporan Resmi & Cadangkan Data</h2>
+              <p class="text-sm text-slate-300 mt-1 leading-relaxed">
+                Susun dokumen laporan PKL siap jilid lengkap dengan 3 kolom tanda tangan, unduh Excel, atau pindahkan data antar HP & laptop memakai berkas cadangan (.JSON).
+              </p>
+            </div>
+            <button type="button" onclick="openCloudConfigModal()"
+              class="self-start shrink-0 inline-flex items-center gap-2 bg-slate-700 hover:bg-slate-600 text-primary-200 border border-slate-500 font-bold text-xs px-4 py-3 rounded-2xl transition cursor-pointer">
+              <span>☁️ Sinkronisasi Cloud (Firebase)</span>
+            </button>
+          </div>
 
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mt-5">
             <button type="button" onclick="generateOfficialPrintReport()"
@@ -962,12 +976,12 @@
 
             <button type="button" onclick="exportBackupJSON()"
               class="flex items-center justify-center gap-2 bg-slate-700 hover:bg-slate-600 text-white font-bold text-sm px-4 py-4 rounded-2xl border border-slate-500 transition cursor-pointer">
-              <span>💾 Cadangkan (.JSON)</span>
+              <span>💾 Simpan Cadangan (.JSON)</span>
             </button>
 
             <label for="import-json-file"
               class="flex items-center justify-center gap-2 bg-slate-700 hover:bg-slate-600 text-white font-bold text-sm px-4 py-4 rounded-2xl border border-slate-500 transition cursor-pointer">
-              <span>📂 Pulihkan (.JSON)</span>
+              <span>📂 Pulihkan Data (.JSON)</span>
             </label>
             <input type="file" id="import-json-file" accept=".json,application/json" class="hidden" onchange="importBackupJSON(event)">
           </div>
@@ -1095,8 +1109,54 @@
   </div>
 
   <!-- ===================================================================== -->
-  <!-- 5. MODAL INTERAKTIF (VERIFIKASI PEMBIMBING, HAPUS, & LIGHTBOX FOTO)   -->
+  <!-- 5. MODAL INTERAKTIF (CLOUD CONFIG, VERIFIKASI, HAPUS, & LIGHTBOX)     -->
   <!-- ===================================================================== -->
+
+  <!-- Modal Pengaturan Cloud (Firebase Opsional untuk GitHub Pages) -->
+  <div id="cloud-modal" class="fixed inset-0 z-50 hidden bg-slate-900/65 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
+    <div class="bg-white border-2 border-slate-200 rounded-3xl max-w-xl w-full p-6 shadow-2xl my-auto space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-200 pb-3">
+        <h3 class="text-xl font-extrabold text-slate-900">☁️ Pengaturan Cloud (Firebase)</h3>
+        <button type="button" onclick="closeCloudConfigModal()" class="text-slate-500 hover:text-slate-900 p-2 rounded-xl cursor-pointer">✕</button>
+      </div>
+
+      <div class="bg-blue-50 border border-blue-200 rounded-2xl p-4 text-xs text-blue-950 space-y-1.5 leading-relaxed">
+        <p class="font-extrabold text-sm">Panduan Singkat 4 Langkah (Opsional untuk GitHub Pages):</p>
+        <ol class="list-decimal list-inside space-y-1">
+          <li>Buka <strong>console.firebase.google.com</strong> dan buat proyek baru gratis.</li>
+          <li>Aktifkan <strong>Authentication</strong> (metode <em>Email/Password</em> &amp; <em>Anonymous</em>) serta <strong>Cloud Firestore</strong>.</li>
+          <li>Buka <strong>Project Settings &gt; General &gt; Your apps (Web)</strong>, lalu salin objek JSON <code>firebaseConfig</code>.</li>
+          <li>Tempelkan konfigurasi di bawah ini agar jurnal tersinkronisasi otomatis antara HP &amp; laptop.</li>
+        </ol>
+      </div>
+
+      <form onsubmit="saveCustomFirebaseConfig(event)" class="space-y-3">
+        <div>
+          <label for="custom-firebase-json" class="block text-sm font-bold text-slate-800 mb-1">
+            Tempel Konfigurasi Firebase (Format JSON)
+          </label>
+          <textarea id="custom-firebase-json" rows="6"
+            placeholder='{"apiKey": "AIzaSy...", "authDomain": "proyek-pkl.firebaseapp.com", "projectId": "proyek-pkl", "storageBucket": "...", "messagingSenderId": "...", "appId": "..."}'
+            class="w-full px-3.5 py-3 bg-slate-50 border-2 border-slate-300 rounded-2xl font-mono text-xs focus:bg-white focus:border-primary-600 focus:outline-none"></textarea>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-1">
+          <button type="button" onclick="clearCustomFirebaseConfig()"
+            class="py-3 px-3 rounded-xl font-bold text-xs text-rose-800 bg-rose-50 hover:bg-rose-100 border border-rose-200 transition cursor-pointer">
+            Gunakan Mode Perangkat
+          </button>
+          <button type="button" onclick="closeCloudConfigModal()"
+            class="py-3 px-3 rounded-xl font-bold text-sm text-slate-700 bg-slate-100 hover:bg-slate-200 transition cursor-pointer">
+            Tutup
+          </button>
+          <button type="submit"
+            class="py-3 px-3 rounded-xl font-extrabold text-sm text-white bg-primary-700 hover:bg-primary-800 shadow-sm transition cursor-pointer">
+            Simpan & Hubungkan
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
 
   <!-- Modal Khusus Verifikasi & Paraf Pembimbing -->
   <div id="verify-modal" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
@@ -1147,7 +1207,7 @@
       <div class="w-14 h-14 bg-rose-100 text-rose-600 rounded-full flex items-center justify-center mx-auto mb-3 text-2xl font-bold">🗑️</div>
       <h3 class="text-xl font-extrabold text-slate-900">Hapus Catatan Jurnal?</h3>
       <p class="text-sm text-slate-600 mt-2">
-        Catatan "<strong id="delete-entry-title" class="text-slate-900"></strong>" akan dihapus permanen dari cloud.
+        Catatan "<strong id="delete-entry-title" class="text-slate-900"></strong>" akan dihapus secara permanen.
       </p>
       <div class="grid grid-cols-2 gap-3 mt-6">
         <button type="button" onclick="closeDeleteModal()" class="py-3.5 rounded-xl font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 transition cursor-pointer">
@@ -1179,10 +1239,10 @@
   <div id="toast-container" class="fixed bottom-20 md:bottom-6 right-4 z-50 flex flex-col gap-2 max-w-sm w-full pointer-events-none"></div>
 
   <!-- ===================================================================== -->
-  <!-- 6. LOGIKA FRONTEND & BACKEND FIREBASE AUTH + CLOUD FIRESTORE          -->
+  <!-- 6. LOGIKA FRONTEND & HYBRID STORAGE (ANTI-MACET CLOUD / LOKAL)        -->
   <!-- ===================================================================== -->
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { initializeApp, getApps, deleteApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
     import {
       getAuth,
       signInWithEmailAndPassword,
@@ -1206,11 +1266,6 @@
     } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
     const appId = typeof __app_id !== 'undefined' ? __app_id : 'jurnal-pkl-terpadu';
-    const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
 
     // Helper Tanggal Relatif (YYYY-MM-DD)
     function getOffsetDate(days) {
@@ -1246,10 +1301,36 @@
       catatanAkhir: 'Peserta PKL menunjukkan kedisiplinan yang sangat baik, cepat beradaptasi dengan alur kerja instansi, serta mampu menyelesaikan tugas administrasi dan teknis dengan rapi.'
     };
 
-    // State Global
+    function getSeedSampleEntry() {
+      return {
+        id: 'sample-' + Date.now(),
+        date: getOffsetDate(-1),
+        attendance: 'Hadir di Lokasi',
+        startTime: '08:00',
+        endTime: '16:00',
+        durationMinutes: 480,
+        division: 'Administrasi & Operasional',
+        title: 'Orientasi Lingkungan Kerja & Pengenalan SOP Divisi',
+        description: 'Mengikuti pengarahan dari pembimbing lapangan terkait tata tertib instansi, pengenalan alur surat-menyurat, dan penataan meja kerja.',
+        tools: 'Buku Panduan SOP, Komputer Kantor',
+        obstacle: 'Belum hafal kode pengarsipan divisi; diatasi dengan mencatat daftar kode map.',
+        skill: 'Memahami alur administrasi perkantoran dan etika kerja profesional.',
+        photoBase64: '',
+        approvalStatus: 'Diparaf Pembimbing Lapangan',
+        supervisorNote: 'Adaptasi sangat baik, tetap teliti dalam mencatat kode arsip.',
+        createdAt: Date.now() - 86400000
+      };
+    }
+
+    // State Aplikasi Global
+    let storageMode = 'local'; // 'cloud' atau 'local'
+    let auth = null;
+    let db = null;
     let currentUser = null;
     let authMode = 'login';
     let currentTab = 'beranda';
+    let bootResolved = false;
+
     let userProfile = { ...DEFAULT_PROFILE };
     let userEvaluation = { ...DEFAULT_EVALUATION };
     let journalEntries = [];
@@ -1259,6 +1340,263 @@
     let unsubProfile = null;
     let unsubEval = null;
     let unsubEntries = null;
+
+    // =====================================================================
+    // PENYIMPANAN PERANGKAT (INDEXEDDB + FALLBACK MEMORI) UNTUK GITHUB PAGES
+    // =====================================================================
+    const IDB_NAME = 'BukuJurnalPKL_DB_v1';
+    const IDB_STORE = 'appdata';
+
+    function openDeviceDB() {
+      return new Promise((resolve, reject) => {
+        try {
+          if (!window.indexedDB) {
+            reject(new Error('IndexedDB not supported'));
+            return;
+          }
+          const req = indexedDB.open(IDB_NAME, 1);
+          req.onupgradeneeded = (e) => {
+            const database = e.target.result;
+            if (!database.objectStoreNames.contains(IDB_STORE)) {
+              database.createObjectStore(IDB_STORE);
+            }
+          };
+          req.onsuccess = () => resolve(req.result);
+          req.onerror = () => reject(req.error);
+        } catch (err) {
+          reject(err);
+        }
+      });
+    }
+
+    async function idbGet(key) {
+      try {
+        const database = await openDeviceDB();
+        return await new Promise((resolve) => {
+          const tx = database.transaction(IDB_STORE, 'readonly');
+          const store = tx.objectStore(IDB_STORE);
+          const req = store.get(key);
+          req.onsuccess = () => resolve(req.result ?? null);
+          req.onerror = () => resolve(null);
+        });
+      } catch (e) {
+        return null;
+      }
+    }
+
+    async function idbSet(key, value) {
+      try {
+        const database = await openDeviceDB();
+        await new Promise((resolve) => {
+          const tx = database.transaction(IDB_STORE, 'readwrite');
+          const store = tx.objectStore(IDB_STORE);
+          store.put(value, key);
+          tx.oncomplete = () => resolve(true);
+          tx.onerror = () => resolve(false);
+        });
+      } catch (e) {
+        // Tetap aman berjalan di memori jika peramban memblokir penyimpanan lokal
+      }
+    }
+
+    async function persistLocalStateToDevice() {
+      await idbSet('profile', userProfile);
+      await idbSet('evaluation', userEvaluation);
+      await idbSet('entries', journalEntries);
+    }
+
+    async function loadLocalStateFromDevice() {
+      const savedProfile = await idbGet('profile');
+      const savedEval = await idbGet('evaluation');
+      const savedEntries = await idbGet('entries');
+
+      userProfile = savedProfile ? { ...DEFAULT_PROFILE, ...savedProfile } : { ...DEFAULT_PROFILE };
+      userEvaluation = savedEval ? { ...DEFAULT_EVALUATION, ...savedEval } : { ...DEFAULT_EVALUATION };
+
+      if (Array.isArray(savedEntries)) {
+        journalEntries = savedEntries;
+      } else {
+        journalEntries = [getSeedSampleEntry()];
+        await persistLocalStateToDevice();
+      }
+    }
+
+    // =====================================================================
+    // INISIALISASI ANTI-MACET (< 2 DETIK FALLBACK OTOMATIS)
+    // =====================================================================
+    function getValidFirebaseConfig(customObj = null) {
+      if (customObj && customObj.apiKey && customObj.projectId) {
+        return customObj;
+      }
+      try {
+        if (typeof __firebase_config !== 'undefined' && __firebase_config) {
+          const parsed = typeof __firebase_config === 'string'
+            ? JSON.parse(__firebase_config)
+            : __firebase_config;
+          if (parsed && parsed.apiKey && parsed.projectId) {
+            return parsed;
+          }
+        }
+      } catch (e) {
+        console.warn('Konfigurasi bawaan tidak tersedia, beralih ke mode perangkat.');
+      }
+      return null;
+    }
+
+    window.forceEnterLocalMode = async function() {
+      bootResolved = true;
+      storageMode = 'local';
+      currentUser = null;
+
+      if (unsubProfile) { unsubProfile(); unsubProfile = null; }
+      if (unsubEval) { unsubEval(); unsubEval = null; }
+      if (unsubEntries) { unsubEntries(); unsubEntries = null; }
+
+      await loadLocalStateFromDevice();
+
+      document.getElementById('loading-screen').classList.add('hidden');
+      document.getElementById('auth-screen').classList.add('hidden');
+      document.getElementById('app-screen').classList.remove('hidden');
+
+      document.getElementById('storage-indicator-dot').className = 'w-2 h-2 rounded-full bg-teal-400 shrink-0';
+      document.getElementById('user-account-label').textContent = 'Mode Perangkat (Tersimpan Otomatis di HP/Laptop)';
+      document.getElementById('btn-header-logout').classList.add('hidden');
+
+      document.getElementById('f-date').value = getOffsetDate(0);
+      updateDurationPreview();
+      refreshAllViews();
+    };
+
+    async function initApplication() {
+      // Batas waktu maksimal 1.8 detik: jika cloud tidak merespons, langsung masuk Mode Perangkat!
+      const safetyTimer = setTimeout(() => {
+        if (!bootResolved) {
+          console.info('Batas waktu koneksi cloud tercapai, beralih mulus ke Mode Perangkat.');
+          window.forceEnterLocalMode();
+        }
+      }, 1800);
+
+      try {
+        const savedCustomConfig = await idbGet('customFirebaseConfig');
+        if (savedCustomConfig) {
+          document.getElementById('custom-firebase-json').value = JSON.stringify(savedCustomConfig, null, 2);
+        }
+
+        const config = getValidFirebaseConfig(savedCustomConfig);
+        if (!config) {
+          clearTimeout(safetyTimer);
+          await window.forceEnterLocalMode();
+          return;
+        }
+
+        // Bersihkan instance Firebase lama jika user mengganti konfigurasi
+        if (getApps().length > 0) {
+          for (const existingApp of getApps()) {
+            await deleteApp(existingApp);
+          }
+        }
+
+        const firebaseApp = initializeApp(config);
+        auth = getAuth(firebaseApp);
+        db = getFirestore(firebaseApp);
+        storageMode = 'cloud';
+
+        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+          await signInWithCustomToken(auth, __initial_auth_token);
+        }
+
+        onAuthStateChanged(auth, async (user) => {
+          clearTimeout(safetyTimer);
+          bootResolved = true;
+          currentUser = user;
+
+          if (unsubProfile) { unsubProfile(); unsubProfile = null; }
+          if (unsubEval) { unsubEval(); unsubEval = null; }
+          if (unsubEntries) { unsubEntries(); unsubEntries = null; }
+
+          document.getElementById('loading-screen').classList.add('hidden');
+
+          if (!user) {
+            document.getElementById('app-screen').classList.add('hidden');
+            document.getElementById('auth-screen').classList.remove('hidden');
+            return;
+          }
+
+          document.getElementById('auth-screen').classList.add('hidden');
+          document.getElementById('app-screen').classList.remove('hidden');
+
+          document.getElementById('storage-indicator-dot').className = 'w-2 h-2 rounded-full bg-emerald-400 shrink-0';
+          document.getElementById('user-account-label').textContent = user.isAnonymous
+            ? 'Mode Cloud Demo (Tersinkronisasi)'
+            : `${user.email || 'Akun Cloud'} • Tersinkronisasi`;
+          document.getElementById('btn-header-logout').classList.remove('hidden');
+
+          document.getElementById('f-date').value = getOffsetDate(0);
+          updateDurationPreview();
+          subscribeCloudCollections(user.uid);
+        });
+      } catch (err) {
+        console.error('Fallback ke Mode Perangkat karena:', err);
+        clearTimeout(safetyTimer);
+        await window.forceEnterLocalMode();
+      }
+    }
+
+    // Jalankan inisialisasi segera setelah DOM siap
+    initApplication();
+
+    function refreshAllViews() {
+      syncProfileToUI();
+      syncEvaluationToUI();
+      updateMonthFilterOptions();
+      recalculateStatsAndDashboard();
+      renderRecentPreview();
+      renderLogbookList();
+    }
+
+    // =====================================================================
+    // MODAL PENGATURAN CLOUD (FIREBASE OPSIONAL UNTUK GITHUB PAGES)
+    // =====================================================================
+    window.openCloudConfigModal = function() {
+      document.getElementById('cloud-modal').classList.remove('hidden');
+    };
+
+    window.closeCloudConfigModal = function() {
+      document.getElementById('cloud-modal').classList.add('hidden');
+    };
+
+    window.saveCustomFirebaseConfig = async function(e) {
+      e.preventDefault();
+      const raw = document.getElementById('custom-firebase-json').value.trim();
+      if (!raw) {
+        showToast('Tempelkan JSON konfigurasi Firebase terlebih dahulu.', 'error');
+        return;
+      }
+      try {
+        const parsed = JSON.parse(raw);
+        if (!parsed.apiKey || !parsed.projectId) {
+          showToast('Konfigurasi harus memuat "apiKey" dan "projectId".', 'error');
+          return;
+        }
+        await idbSet('customFirebaseConfig', parsed);
+        closeCloudConfigModal();
+        bootResolved = false;
+        document.getElementById('app-screen').classList.add('hidden');
+        document.getElementById('loading-screen').classList.remove('hidden');
+        showToast('Menghubungkan ke proyek Firebase Anda...', 'info');
+        await initApplication();
+      } catch (err) {
+        showToast('Format JSON tidak valid. Pastikan memakai tanda kutip ganda (").', 'error');
+      }
+    };
+
+    window.clearCustomFirebaseConfig = async function() {
+      await idbSet('customFirebaseConfig', null);
+      document.getElementById('custom-firebase-json').value = '';
+      closeCloudConfigModal();
+      await window.forceEnterLocalMode();
+      showToast('Beralih ke Mode Penyimpanan Perangkat.', 'info');
+    };
 
     // =====================================================================
     // PENGATUR UKURAN TEKS (AKSESIBILITAS SEMUA KALANGAN USIA)
@@ -1296,7 +1634,6 @@
       const activeView = document.getElementById(`view-${tabName}`);
       if (activeView) activeView.classList.remove('hidden');
 
-      // Desktop nav style
       document.querySelectorAll('.nav-tab-desktop').forEach(btn => {
         const active = btn.getAttribute('data-tab-target') === tabName;
         btn.className = active
@@ -1304,7 +1641,6 @@
           : 'nav-tab-desktop flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl font-bold text-sm text-slate-300 hover:bg-slate-800 transition cursor-pointer';
       });
 
-      // Mobile nav style
       document.querySelectorAll('.nav-tab-mobile').forEach(btn => {
         const active = btn.getAttribute('data-tab-target') === tabName;
         btn.className = active
@@ -1316,47 +1652,8 @@
     };
 
     // =====================================================================
-    // AUTENTIKASI FIREBASE
+    // AUTENTIKASI CLOUD (SAAT CLOUD FIREBASE AKTIF)
     // =====================================================================
-    async function bootstrapAuth() {
-      try {
-        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-          await signInWithCustomToken(auth, __initial_auth_token);
-        }
-      } catch (e) {
-        console.error('Auth token info:', e);
-      }
-    }
-
-    onAuthStateChanged(auth, (user) => {
-      currentUser = user;
-      document.getElementById('loading-screen').classList.add('hidden');
-
-      if (unsubProfile) { unsubProfile(); unsubProfile = null; }
-      if (unsubEval) { unsubEval(); unsubEval = null; }
-      if (unsubEntries) { unsubEntries(); unsubEntries = null; }
-
-      if (!user) {
-        document.getElementById('app-screen').classList.add('hidden');
-        document.getElementById('auth-screen').classList.remove('hidden');
-        return;
-      }
-
-      document.getElementById('auth-screen').classList.add('hidden');
-      document.getElementById('app-screen').classList.remove('hidden');
-
-      const labelEl = document.getElementById('user-account-label');
-      labelEl.textContent = user.isAnonymous
-        ? 'Mode Demo (Tersimpan di Cloud)'
-        : `${user.email || 'Akun Aktif'} • Tersimpan di Cloud`;
-
-      document.getElementById('f-date').value = getOffsetDate(0);
-      updateDurationPreview();
-      subscribeAllUserCollections(user.uid);
-    });
-
-    bootstrapAuth();
-
     window.switchAuthTab = function(mode) {
       authMode = mode;
       const tLogin = document.getElementById('tab-login');
@@ -1377,6 +1674,7 @@
 
     window.handleEmailAuth = async function(e) {
       e.preventDefault();
+      if (!auth) return;
       const email = document.getElementById('auth-email').value.trim();
       const pass = document.getElementById('auth-password').value;
       const errBox = document.getElementById('auth-error-box');
@@ -1406,31 +1704,27 @@
     };
 
     window.handleGoogleLogin = async function() {
+      if (!auth) return;
       const errBox = document.getElementById('auth-error-box');
       errBox.classList.add('hidden');
       try {
         await signInWithPopup(auth, new GoogleAuthProvider());
         showToast('Berhasil masuk dengan Google!', 'success');
       } catch (e) {
-        errBox.textContent = 'Login Google tidak tersedia di jendela ini. Silakan gunakan Email & Kata Sandi.';
+        errBox.textContent = 'Login Google tidak tersedia di domain ini. Gunakan Email & Kata Sandi atau Mode Perangkat.';
         errBox.classList.remove('hidden');
       }
     };
 
-    window.handleGuestLogin = async function() {
-      try {
-        await signInAnonymously(auth);
-        showToast('Masuk dalam mode cepat.', 'info');
-      } catch (e) {
-        showToast('Gagal masuk mode cepat.', 'error');
-      }
-    };
-
     window.handleLogout = async function() {
+      if (!auth) {
+        await window.forceEnterLocalMode();
+        return;
+      }
       try {
         await signOut(auth);
         journalEntries = [];
-        showToast('Anda telah keluar dari akun.', 'info');
+        showToast('Anda telah keluar dari akun cloud.', 'info');
       } catch (e) {
         showToast('Gagal keluar dari akun.', 'error');
       }
@@ -1439,10 +1733,9 @@
     // =====================================================================
     // SINKRONISASI CLOUD FIRESTORE (STRICT PATHS & NO COMPLEX QUERIES)
     // =====================================================================
-    function subscribeAllUserCollections(uid) {
-      if (!currentUser) return;
+    function subscribeCloudCollections(uid) {
+      if (!currentUser || !db) return;
 
-      // 1. Profil: /artifacts/{appId}/users/{userId}/settings/profile
       const profileRef = doc(db, 'artifacts', appId, 'users', uid, 'settings', 'profile');
       unsubProfile = onSnapshot(
         profileRef,
@@ -1456,12 +1749,9 @@
           syncProfileToUI();
           recalculateStatsAndDashboard();
         },
-        (err) => {
-          console.error('Profile snapshot error:', err);
-        }
+        (err) => console.error('Profile snapshot error:', err)
       );
 
-      // 2. Penilaian Akhir: /artifacts/{appId}/users/{userId}/settings/evaluation
       const evalRef = doc(db, 'artifacts', appId, 'users', uid, 'settings', 'evaluation');
       unsubEval = onSnapshot(
         evalRef,
@@ -1474,18 +1764,16 @@
           }
           syncEvaluationToUI();
         },
-        (err) => {
-          console.error('Evaluation snapshot error:', err);
-        }
+        (err) => console.error('Evaluation snapshot error:', err)
       );
 
-      // 3. Jurnal Harian: /artifacts/{appId}/users/{userId}/entries
       const entriesRef = collection(db, 'artifacts', appId, 'users', uid, 'entries');
       unsubEntries = onSnapshot(
         entriesRef,
         async (snap) => {
           if (snap.empty && !snap.metadata.hasPendingWrites) {
-            await seedInitialEntries(entriesRef);
+            const { id, ...sampleData } = getSeedSampleEntry();
+            try { await addDoc(entriesRef, sampleData); } catch (e) {}
             return;
           }
           journalEntries = snap.docs.map(d => ({ id: d.id, ...d.data() }));
@@ -1501,31 +1789,6 @@
       );
     }
 
-    async function seedInitialEntries(entriesRef) {
-      if (!currentUser) return;
-      try {
-        await addDoc(entriesRef, {
-          date: getOffsetDate(-1),
-          attendance: 'Hadir di Lokasi',
-          startTime: '08:00',
-          endTime: '16:00',
-          durationMinutes: 480,
-          division: 'Administrasi & Operasional',
-          title: 'Orientasi Lingkungan Kerja & Pengenalan SOP Divisi',
-          description: 'Mengikuti pengarahan dari pembimbing lapangan terkait tata tertib instansi, pengenalan alur surat-menyurat, dan penataan meja kerja.',
-          tools: 'Buku Panduan SOP, Komputer Kantor',
-          obstacle: 'Belum hafal kode pengarsipan divisi; diatasi dengan mencatat daftar kode map.',
-          skill: 'Memahami alur administrasi perkantoran dan etika kerja profesional.',
-          photoBase64: '',
-          approvalStatus: 'Diparaf Pembimbing Lapangan',
-          supervisorNote: 'Adaptasi sangat baik, tetap teliti dalam mencatat kode arsip.',
-          createdAt: Date.now() - 86400000
-        });
-      } catch (e) {
-        console.error('Seed error:', e);
-      }
-    }
-
     // =====================================================================
     // PERHITUNGAN DURASI JAM & STATISTIK DASHBOARD
     // =====================================================================
@@ -1534,9 +1797,7 @@
       if (!startStr || !endStr) return 0;
       const [sh, sm] = startStr.split(':').map(Number);
       const [eh, em] = endStr.split(':').map(Number);
-      const startTotal = sh * 60 + sm;
-      const endTotal = eh * 60 + em;
-      const diff = endTotal - startTotal;
+      const diff = (eh * 60 + em) - (sh * 60 + sm);
       return diff > 0 ? diff : 0;
     }
 
@@ -1552,15 +1813,12 @@
       const att = document.getElementById('f-attendance').value;
       const mins = computeDurationMinutes(start, end, att);
       const badge = document.getElementById('duration-preview-badge');
-      if (att === 'Izin' || att === 'Sakit') {
-        badge.textContent = '0 Jam (Status Izin/Sakit)';
-      } else {
-        badge.textContent = formatMinutesToText(mins);
-      }
+      badge.textContent = (att === 'Izin' || att === 'Sakit')
+        ? '0 Jam (Status Izin/Sakit)'
+        : formatMinutesToText(mins);
     };
 
     function recalculateStatsAndDashboard() {
-      // Hitung hari unik berdasarkan status kehadiran
       const hadirDates = new Set();
       const izinDates = new Set();
       let totalMinutes = 0;
@@ -1638,7 +1896,6 @@
           const ctx = canvas.getContext('2d');
           ctx.drawImage(img, 0, 0, width, height);
 
-          // Kompres bertahap hingga ukuran string < 115KB
           let quality = 0.72;
           let dataUrl = canvas.toDataURL('image/jpeg', quality);
           while (dataUrl.length > 115000 && quality > 0.25) {
@@ -1685,7 +1942,6 @@
 
     window.handleJournalSubmit = async function(e) {
       e.preventDefault();
-      if (!currentUser) return;
 
       const id = document.getElementById('entry-id').value;
       const date = document.getElementById('f-date').value;
@@ -1723,19 +1979,38 @@
       };
 
       try {
-        if (id) {
-          const docRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'entries', id);
-          await updateDoc(docRef, payload);
-          showToast('Perubahan jurnal berhasil disimpan!', 'success');
+        if (storageMode === 'cloud' && currentUser && db) {
+          if (id) {
+            await updateDoc(doc(db, 'artifacts', appId, 'users', currentUser.uid, 'entries', id), payload);
+            showToast('Perubahan jurnal berhasil disimpan ke cloud!', 'success');
+          } else {
+            await addDoc(collection(db, 'artifacts', appId, 'users', currentUser.uid, 'entries'), {
+              ...payload,
+              createdAt: Date.now()
+            });
+            showToast('Jurnal kegiatan baru berhasil disimpan ke cloud!', 'success');
+          }
         } else {
-          const colRef = collection(db, 'artifacts', appId, 'users', currentUser.uid, 'entries');
-          await addDoc(colRef, { ...payload, createdAt: Date.now() });
-          showToast('Jurnal kegiatan baru berhasil disimpan ke cloud!', 'success');
+          // Mode Penyimpanan Perangkat (Offline/Lokal)
+          if (id) {
+            const idx = journalEntries.findIndex(x => x.id === id);
+            if (idx !== -1) journalEntries[idx] = { ...journalEntries[idx], ...payload };
+            showToast('Perubahan jurnal berhasil disimpan di perangkat!', 'success');
+          } else {
+            journalEntries.unshift({
+              id: 'entry-' + Date.now() + '-' + Math.random().toString(36).slice(2, 6),
+              ...payload,
+              createdAt: Date.now()
+            });
+            showToast('Jurnal kegiatan berhasil disimpan di perangkat!', 'success');
+          }
+          await persistLocalStateToDevice();
+          refreshAllViews();
         }
         resetJournalForm();
       } catch (err) {
         console.error('Save journal error:', err);
-        showToast('Gagal menyimpan jurnal. Periksa koneksi internet.', 'error');
+        showToast('Gagal menyimpan jurnal. Silakan coba lagi.', 'error');
       } finally {
         btn.disabled = false;
       }
@@ -1862,12 +2137,10 @@
         ? item.durationMinutes
         : computeDurationMinutes(item.startTime, item.endTime, item.attendance);
 
-      // Badge Kehadiran
       let attBadge = 'bg-blue-100 text-blue-900 border-blue-200';
       if (item.attendance === 'Daring/WFH') attBadge = 'bg-indigo-100 text-indigo-900 border-indigo-200';
       else if (item.attendance === 'Izin' || item.attendance === 'Sakit') attBadge = 'bg-rose-100 text-rose-900 border-rose-200';
 
-      // Badge Paraf
       let appBadge = 'bg-amber-100 text-amber-950 border-amber-300';
       let appIcon = '⏳';
       let borderCard = 'border-slate-200';
@@ -1902,7 +2175,6 @@
 
       return `
         <article class="bg-white border-2 ${borderCard} rounded-3xl p-5 sm:p-6 shadow-2xs space-y-3">
-          <!-- Baris Atas: Tanggal, Waktu & Status Paraf -->
           <div class="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-slate-100">
             <div class="flex flex-wrap items-center gap-2 text-xs sm:text-sm font-bold">
               <span class="bg-slate-100 text-slate-800 px-3 py-1.5 rounded-xl">📅 ${formatIndoDate(item.date)}</span>
@@ -1914,14 +2186,12 @@
             </span>
           </div>
 
-          <!-- Judul & Uraian -->
           <div>
             ${item.division ? `<span class="text-xs font-extrabold uppercase tracking-wider text-primary-700">Divisi: ${escapeHtml(item.division)}</span>` : ''}
             <h3 class="text-lg sm:text-xl font-extrabold text-slate-900 mt-0.5">${escapeHtml(item.title)}</h3>
             <p class="text-sm sm:text-base text-slate-700 mt-2 leading-relaxed whitespace-pre-line">${escapeHtml(item.description)}</p>
           </div>
 
-          <!-- Detail Tambahan (Alat, Kendala, Kompetensi) -->
           <div class="grid grid-cols-1 md:grid-cols-3 gap-2.5 pt-1 text-xs">
             ${item.tools ? `<div class="bg-slate-50 border border-slate-200 rounded-xl p-2.5"><strong class="text-slate-800 block mb-0.5">🛠️ Alat/Aplikasi:</strong><span class="text-slate-700">${escapeHtml(item.tools)}</span></div>` : ''}
             ${item.obstacle ? `<div class="bg-slate-50 border border-slate-200 rounded-xl p-2.5"><strong class="text-slate-800 block mb-0.5">⚠️ Kendala & Solusi:</strong><span class="text-slate-700">${escapeHtml(item.obstacle)}</span></div>` : ''}
@@ -1931,7 +2201,6 @@
           ${photoHtml}
           ${noteHtml}
 
-          <!-- Tombol Aksi Cepat -->
           <div class="pt-3 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
             <button type="button" onclick="openVerifyModal('${item.id}')"
               class="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-sm px-4 py-3 rounded-xl shadow-2xs transition cursor-pointer">
@@ -1996,14 +2265,24 @@
 
     window.submitSupervisorVerification = async function(e) {
       e.preventDefault();
-      if (!currentUser) return;
       const id = document.getElementById('verify-entry-id').value;
       const approvalStatus = document.getElementById('verify-status-select').value;
       const supervisorNote = document.getElementById('verify-note-input').value.trim();
 
       try {
-        const docRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'entries', id);
-        await updateDoc(docRef, { approvalStatus, supervisorNote });
+        if (storageMode === 'cloud' && currentUser && db) {
+          await updateDoc(doc(db, 'artifacts', appId, 'users', currentUser.uid, 'entries', id), {
+            approvalStatus,
+            supervisorNote
+          });
+        } else {
+          const idx = journalEntries.findIndex(x => x.id === id);
+          if (idx !== -1) {
+            journalEntries[idx] = { ...journalEntries[idx], approvalStatus, supervisorNote };
+            await persistLocalStateToDevice();
+            refreshAllViews();
+          }
+        }
         closeVerifyModal();
         showToast('Status paraf & catatan pembimbing berhasil disimpan!', 'success');
       } catch (err) {
@@ -2026,9 +2305,15 @@
     };
 
     window.confirmDeleteEntry = async function() {
-      if (!currentUser || !pendingDeleteId) return;
+      if (!pendingDeleteId) return;
       try {
-        await deleteDoc(doc(db, 'artifacts', appId, 'users', currentUser.uid, 'entries', pendingDeleteId));
+        if (storageMode === 'cloud' && currentUser && db) {
+          await deleteDoc(doc(db, 'artifacts', appId, 'users', currentUser.uid, 'entries', pendingDeleteId));
+        } else {
+          journalEntries = journalEntries.filter(x => x.id !== pendingDeleteId);
+          await persistLocalStateToDevice();
+          refreshAllViews();
+        }
         if (document.getElementById('entry-id').value === pendingDeleteId) resetJournalForm();
         closeDeleteModal();
         showToast('Catatan jurnal berhasil dihapus.', 'info');
@@ -2084,8 +2369,6 @@
 
     window.saveEvaluationData = async function(e) {
       e.preventDefault();
-      if (!currentUser) return;
-
       const updatedEval = {
         disiplin: Number(document.getElementById('eval-1').value) || 0,
         tanggungJawab: Number(document.getElementById('eval-2').value) || 0,
@@ -2096,9 +2379,14 @@
       };
 
       try {
-        const evalRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'settings', 'evaluation');
-        await setDoc(evalRef, updatedEval);
-        showToast('Penilaian akhir PKL berhasil disimpan ke cloud!', 'success');
+        if (storageMode === 'cloud' && currentUser && db) {
+          await setDoc(doc(db, 'artifacts', appId, 'users', currentUser.uid, 'settings', 'evaluation'), updatedEval);
+          showToast('Penilaian akhir PKL berhasil disimpan ke cloud!', 'success');
+        } else {
+          userEvaluation = updatedEval;
+          await persistLocalStateToDevice();
+          showToast('Penilaian akhir PKL berhasil disimpan di perangkat!', 'success');
+        }
       } catch (err) {
         showToast('Gagal menyimpan penilaian akhir.', 'error');
       }
@@ -2135,8 +2423,6 @@
 
     window.saveFullProfile = async function(e) {
       e.preventDefault();
-      if (!currentUser) return;
-
       const updated = {
         nama: document.getElementById('p-nama').value.trim(),
         nis: document.getElementById('p-nis').value.trim(),
@@ -2155,16 +2441,21 @@
       };
 
       try {
-        const profileRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'settings', 'profile');
-        await setDoc(profileRef, updated);
-        showToast('Seluruh data profil peserta & instansi berhasil diperbarui!', 'success');
+        if (storageMode === 'cloud' && currentUser && db) {
+          await setDoc(doc(db, 'artifacts', appId, 'users', currentUser.uid, 'settings', 'profile'), updated);
+          showToast('Data profil berhasil diperbarui di cloud!', 'success');
+        } else {
+          userProfile = updated;
+          await persistLocalStateToDevice();
+          refreshAllViews();
+          showToast('Data profil berhasil disimpan di perangkat!', 'success');
+        }
       } catch (err) {
         showToast('Gagal menyimpan profil.', 'error');
       }
     };
 
     window.generateOfficialPrintReport = function() {
-      // Bagian A: Identitas
       document.getElementById('pr-header-sekolah').textContent = userProfile.sekolah || '-';
       document.getElementById('pr-nama').textContent = userProfile.nama || '-';
       document.getElementById('pr-nis').textContent = userProfile.nis || '-';
@@ -2177,7 +2468,6 @@
       document.getElementById('pr-pembimbing-lap').textContent = `${userProfile.pembimbingNama || '-'} (${userProfile.pembimbingNip || '-'})`;
       document.getElementById('pr-guru-pemb').textContent = `${userProfile.guruNama || '-'} (${userProfile.guruNip || '-'})`;
 
-      // Bagian B: Rekap Kehadiran
       const hadirDates = new Set();
       const izinDates = new Set();
       let totalMins = 0;
@@ -2205,7 +2495,6 @@
       document.getElementById('pr-stat-paraf').textContent = `${approved} / ${journalEntries.length} Jurnal`;
       document.getElementById('pr-stat-persen').textContent = `${pct}%`;
 
-      // Bagian C: Tabel Jurnal Kronologis
       const chrono = [...journalEntries].sort((a, b) => (a.date || '').localeCompare(b.date || '') || (a.startTime || '').localeCompare(b.startTime || ''));
       document.getElementById('pr-filter-info').textContent = `Total ${chrono.length} Catatan Kegiatan`;
 
@@ -2235,7 +2524,6 @@
         `).join('');
       }
 
-      // Bagian D: Lembar Penilaian Akhir
       const evalRows = [
         { label: 'Disiplin & Kehadiran', score: userEvaluation.disiplin ?? 0 },
         { label: 'Tanggung Jawab Pekerjaan', score: userEvaluation.tanggungJawab ?? 0 },
@@ -2257,7 +2545,6 @@
       document.getElementById('pr-eval-predikat').textContent = getPredikatFromScore(avgScore);
       document.getElementById('pr-eval-note').textContent = userEvaluation.catatanAkhir || '-';
 
-      // Bagian E: 3 Tanda Tangan
       document.getElementById('pr-ttd-guru-nama').textContent = `( ${userProfile.guruNama || '....................................'} )`;
       document.getElementById('pr-ttd-guru-nip').textContent = `NIP/NIDN. ${userProfile.guruNip || '-'}`;
       document.getElementById('pr-ttd-lap-nama').textContent = `( ${userProfile.pembimbingNama || '....................................'} )`;
@@ -2316,37 +2603,53 @@
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
-      showToast('Cadangan data (.JSON) berhasil disimpan!', 'success');
+      showToast('Cadangan data (.JSON) berhasil diunduh!', 'success');
     };
 
     window.importBackupJSON = function(event) {
       const file = event.target.files?.[0];
-      if (!file || !currentUser) return;
+      if (!file) return;
 
       const reader = new FileReader();
       reader.onload = async function(e) {
         try {
           const parsed = JSON.parse(e.target.result);
-          if (parsed.profile) {
-            await setDoc(doc(db, 'artifacts', appId, 'users', currentUser.uid, 'settings', 'profile'), {
-              ...DEFAULT_PROFILE,
-              ...parsed.profile
-            });
-          }
-          if (parsed.evaluation) {
-            await setDoc(doc(db, 'artifacts', appId, 'users', currentUser.uid, 'settings', 'evaluation'), {
-              ...DEFAULT_EVALUATION,
-              ...parsed.evaluation
-            });
-          }
-          if (Array.isArray(parsed.entries)) {
-            const entriesRef = collection(db, 'artifacts', appId, 'users', currentUser.uid, 'entries');
-            for (const entry of parsed.entries) {
-              const { id, ...cleanEntry } = entry;
-              await addDoc(entriesRef, { ...cleanEntry, createdAt: cleanEntry.createdAt || Date.now() });
+          if (storageMode === 'cloud' && currentUser && db) {
+            if (parsed.profile) {
+              await setDoc(doc(db, 'artifacts', appId, 'users', currentUser.uid, 'settings', 'profile'), {
+                ...DEFAULT_PROFILE,
+                ...parsed.profile
+              });
             }
+            if (parsed.evaluation) {
+              await setDoc(doc(db, 'artifacts', appId, 'users', currentUser.uid, 'settings', 'evaluation'), {
+                ...DEFAULT_EVALUATION,
+                ...parsed.evaluation
+              });
+            }
+            if (Array.isArray(parsed.entries)) {
+              const entriesRef = collection(db, 'artifacts', appId, 'users', currentUser.uid, 'entries');
+              for (const entry of parsed.entries) {
+                const { id, ...cleanEntry } = entry;
+                await addDoc(entriesRef, { ...cleanEntry, createdAt: cleanEntry.createdAt || Date.now() });
+              }
+            }
+            showToast('Data cadangan (.JSON) berhasil dipulihkan ke cloud!', 'success');
+          } else {
+            if (parsed.profile) userProfile = { ...DEFAULT_PROFILE, ...parsed.profile };
+            if (parsed.evaluation) userEvaluation = { ...DEFAULT_EVALUATION, ...parsed.evaluation };
+            if (Array.isArray(parsed.entries)) {
+              const restored = parsed.entries.map((entry, i) => ({
+                ...entry,
+                id: 'restored-' + Date.now() + '-' + i,
+                createdAt: entry.createdAt || Date.now()
+              }));
+              journalEntries = [...restored, ...journalEntries];
+            }
+            await persistLocalStateToDevice();
+            refreshAllViews();
+            showToast('Data cadangan (.JSON) berhasil dipulihkan ke perangkat!', 'success');
           }
-          showToast('Data cadangan (.JSON) berhasil dipulihkan ke cloud!', 'success');
         } catch (err) {
           showToast('Format file cadangan JSON tidak valid.', 'error');
         } finally {
