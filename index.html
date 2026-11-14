@@ -1,0 +1,2381 @@
+<!DOCTYPE html>
+<html lang="id" class="text-[16px]">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <title>Buku Jurnal & Monitoring PKL Terpadu</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Inter untuk keterbacaan tinggi lintas generasi -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          },
+          colors: {
+            primary: {
+              50: '#f0fdfa',
+              100: '#ccfbf1',
+              200: '#99f6e4',
+              600: '#0d9488',
+              700: '#0f766e',
+              800: '#115e59',
+              900: '#134e4a',
+            },
+            navy: {
+              50: '#eff6ff',
+              100: '#dbeafe',
+              700: '#1d4ed8',
+              800: '#1e40af',
+              900: '#0f172a',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Pengaturan Dasar & Skala Font Dinamis */
+    html {
+      font-family: 'Inter', sans-serif;
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background-color: #f8fafc;
+      color: #0f172a;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Ukuran input & tombol mengikuti skala rem agar nyaman bagi semua usia */
+    button, input, select, textarea {
+      font-size: 1rem;
+    }
+
+    /* Animasi Notifikasi Toast */
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(14px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .toast-anim {
+      animation: slideUp 0.25s ease-out forwards;
+    }
+
+    /* =================================================================== */
+    /* TATA LETAK CETAK / SIMPAN PDF RESMI (@media print)                  */
+    /* =================================================================== */
+    @media print {
+      @page {
+        size: A4 portrait;
+        margin: 15mm 14mm;
+      }
+
+      html {
+        font-size: 12pt !important;
+      }
+
+      body {
+        background: #ffffff !important;
+        color: #000000 !important;
+      }
+
+      .no-print {
+        display: none !important;
+      }
+
+      .print-only {
+        display: block !important;
+      }
+
+      .print-page-break {
+        page-break-before: always;
+        break-before: page;
+      }
+
+      .print-avoid-break {
+        page-break-inside: avoid;
+        break-inside: avoid;
+      }
+
+      .print-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+        font-size: 9.5pt;
+      }
+
+      .print-table th,
+      .print-table td {
+        border: 1px solid #334155;
+        padding: 6px 8px;
+        text-align: left;
+        vertical-align: top;
+      }
+
+      .print-table th {
+        background-color: #f1f5f9 !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+        font-weight: 700;
+      }
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+  <!-- ===================================================================== -->
+  <!-- 1. DOKUMEN LAPORAN RESMI PKL (HANYA TAMPIL SAAT CETAK / SIMPAN PDF)   -->
+  <!-- ===================================================================== -->
+  <div id="print-report" class="hidden print-only text-slate-900">
+    
+    <!-- BAGIAN A: HALAMAN IDENTITAS & RINGKASAN KEHADIRAN -->
+    <div class="border-b-4 border-double border-slate-900 pb-4 mb-6 text-center">
+      <p class="text-xs font-bold uppercase tracking-widest text-slate-600">Laporan Praktik Kerja Lapangan (PKL) / Magang</p>
+      <h1 class="text-2xl font-extrabold uppercase mt-1">Buku Jurnal & Monitoring Kegiatan PKL</h1>
+      <p class="text-sm font-semibold mt-1" id="pr-header-sekolah">-</p>
+    </div>
+
+    <div class="mb-6">
+      <h2 class="text-sm font-bold uppercase bg-slate-100 px-3 py-1.5 border border-slate-400 mb-2">A. Identitas Peserta & Instansi PKL</h2>
+      <table class="w-full text-xs border-collapse">
+        <tr>
+          <td class="w-52 py-1.5 px-2 border border-slate-300 font-semibold bg-slate-50">Nama Lengkap Peserta</td>
+          <td class="py-1.5 px-2 border border-slate-300 font-bold" id="pr-nama">-</td>
+        </tr>
+        <tr>
+          <td class="py-1.5 px-2 border border-slate-300 font-semibold bg-slate-50">NIS / NIM</td>
+          <td class="py-1.5 px-2 border border-slate-300" id="pr-nis">-</td>
+        </tr>
+        <tr>
+          <td class="py-1.5 px-2 border border-slate-300 font-semibold bg-slate-50">Jurusan / Program Studi</td>
+          <td class="py-1.5 px-2 border border-slate-300" id="pr-jurusan">-</td>
+        </tr>
+        <tr>
+          <td class="py-1.5 px-2 border border-slate-300 font-semibold bg-slate-50">Asal Sekolah / Perguruan Tinggi</td>
+          <td class="py-1.5 px-2 border border-slate-300" id="pr-sekolah">-</td>
+        </tr>
+        <tr>
+          <td class="py-1.5 px-2 border border-slate-300 font-semibold bg-slate-50">Nama Perusahaan / Instansi PKL</td>
+          <td class="py-1.5 px-2 border border-slate-300 font-bold" id="pr-perusahaan">-</td>
+        </tr>
+        <tr>
+          <td class="py-1.5 px-2 border border-slate-300 font-semibold bg-slate-50">Alamat Instansi PKL</td>
+          <td class="py-1.5 px-2 border border-slate-300" id="pr-alamat">-</td>
+        </tr>
+        <tr>
+          <td class="py-1.5 px-2 border border-slate-300 font-semibold bg-slate-50">Divisi / Bagian Penempatan</td>
+          <td class="py-1.5 px-2 border border-slate-300" id="pr-divisi">-</td>
+        </tr>
+        <tr>
+          <td class="py-1.5 px-2 border border-slate-300 font-semibold bg-slate-50">Periode Pelaksanaan PKL</td>
+          <td class="py-1.5 px-2 border border-slate-300" id="pr-periode">-</td>
+        </tr>
+        <tr>
+          <td class="py-1.5 px-2 border border-slate-300 font-semibold bg-slate-50">Pembimbing Lapangan / Industri</td>
+          <td class="py-1.5 px-2 border border-slate-300" id="pr-pembimbing-lap">-</td>
+        </tr>
+        <tr>
+          <td class="py-1.5 px-2 border border-slate-300 font-semibold bg-slate-50">Guru / Dosen Pembimbing</td>
+          <td class="py-1.5 px-2 border border-slate-300" id="pr-guru-pemb">-</td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- BAGIAN B: RINGKASAN KEHADIRAN & JAM KERJA -->
+    <div class="mb-6 print-avoid-break">
+      <h2 class="text-sm font-bold uppercase bg-slate-100 px-3 py-1.5 border border-slate-400 mb-2">B. Rekapitulasi Kehadiran & Jam Kerja</h2>
+      <table class="print-table text-center">
+        <thead>
+          <tr>
+            <th class="text-center">Target Hari PKL</th>
+            <th class="text-center">Total Hari Hadir</th>
+            <th class="text-center">Total Akumulasi Jam Kerja</th>
+            <th class="text-center">Izin / Sakit</th>
+            <th class="text-center">Jurnal Sudah Diparaf</th>
+            <th class="text-center">Persentase Target</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="text-center font-bold" id="pr-stat-target">0 Hari</td>
+            <td class="text-center font-bold" id="pr-stat-hadir">0 Hari</td>
+            <td class="text-center font-bold" id="pr-stat-jam">0 Jam 0 Menit</td>
+            <td class="text-center font-bold" id="pr-stat-izin">0 Hari</td>
+            <td class="text-center font-bold" id="pr-stat-paraf">0 Kegiatan</td>
+            <td class="text-center font-bold" id="pr-stat-persen">0%</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- BAGIAN C: TABEL REKAPITULASI JURNAL HARIAN LENGKAP -->
+    <div class="mb-6">
+      <h2 class="text-sm font-bold uppercase bg-slate-100 px-3 py-1.5 border border-slate-400 mb-2">
+        C. Rekapitulasi Jurnal Kegiatan Harian (<span id="pr-filter-info">Semua Periode</span>)
+      </h2>
+      <table class="print-table">
+        <thead>
+          <tr>
+            <th class="w-8 text-center">No</th>
+            <th class="w-28">Hari & Tanggal</th>
+            <th class="w-24">Waktu & Status</th>
+            <th>Uraian Kegiatan, Alat, Kendala & Kompetensi</th>
+            <th class="w-36">Catatan & Paraf Pembimbing</th>
+          </tr>
+        </thead>
+        <tbody id="pr-journal-tbody"></tbody>
+      </table>
+    </div>
+
+    <!-- BAGIAN D: LEMBAR PENILAIAN AKHIR & LEMBAR PENGESAHAN (3 TANDA TANGAN) -->
+    <div class="print-page-break print-avoid-break">
+      <h2 class="text-sm font-bold uppercase bg-slate-100 px-3 py-1.5 border border-slate-400 mb-2">
+        D. Lembar Penilaian Akhir Praktik Kerja Lapangan (PKL)
+      </h2>
+      <table class="print-table mb-4">
+        <thead>
+          <tr>
+            <th class="w-10 text-center">No</th>
+            <th>Aspek yang Dinilai</th>
+            <th class="w-24 text-center">Nilai (0-100)</th>
+            <th class="w-32 text-center">Predikat</th>
+          </tr>
+        </thead>
+        <tbody id="pr-eval-tbody"></tbody>
+        <tfoot>
+          <tr class="bg-slate-100 font-bold">
+            <td colspan="2" class="text-right">NILAI RATA-RATA AKHIR PKL</td>
+            <td class="text-center text-base" id="pr-eval-avg">0</td>
+            <td class="text-center" id="pr-eval-predikat">-</td>
+          </tr>
+        </tfoot>
+      </table>
+
+      <div class="border border-slate-400 p-3 text-xs mb-8">
+        <p class="font-bold mb-1">Catatan / Evaluasi Akhir Pembimbing Lapangan:</p>
+        <p id="pr-eval-note" class="italic text-slate-800">-</p>
+      </div>
+
+      <h2 class="text-sm font-bold uppercase bg-slate-100 px-3 py-1.5 border border-slate-400 mb-4">
+        E. Lembar Pengesahan Laporan PKL
+      </h2>
+      <p class="text-xs mb-6">
+        Demikian laporan Buku Jurnal & Monitoring Kegiatan Praktik Kerja Lapangan (PKL) ini disusun dengan sebenar-benarnya untuk dipergunakan sebagaimana mestinya.
+      </p>
+
+      <div class="grid grid-cols-3 gap-4 text-xs text-center mt-4">
+        <div>
+          <p class="mb-16">Mengetahui,<br><strong>Guru / Dosen Pembimbing</strong></p>
+          <p class="font-bold underline" id="pr-ttd-guru-nama">( ........................................ )</p>
+          <p class="mt-0.5" id="pr-ttd-guru-nip">NIP. -</p>
+        </div>
+        <div>
+          <p class="mb-16">Menyetujui,<br><strong>Pembimbing Lapangan / Instansi</strong></p>
+          <p class="font-bold underline" id="pr-ttd-lap-nama">( ........................................ )</p>
+          <p class="mt-0.5" id="pr-ttd-lap-nip">NIP/ID. -</p>
+        </div>
+        <div>
+          <p class="mb-16">Peserta PKL,<br><strong>Siswa / Mahasiswa</strong></p>
+          <p class="font-bold underline" id="pr-ttd-siswa-nama">( ........................................ )</p>
+          <p class="mt-0.5" id="pr-ttd-siswa-nis">NIS/NIM. -</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- 2. LAYAR PEMUATAN AWAL                                                -->
+  <!-- ===================================================================== -->
+  <div id="loading-screen" class="no-print flex-1 flex flex-col items-center justify-center p-6 text-center">
+    <div class="w-14 h-14 border-4 border-primary-200 border-t-primary-700 rounded-full animate-spin mb-4"></div>
+    <h2 class="text-xl font-extrabold text-slate-900">Membuka Buku Jurnal PKL Terpadu...</h2>
+    <p class="text-base text-slate-600 mt-1">Menghubungkan sinkronisasi cloud lintas perangkat.</p>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- 3. LAYAR MASUK / DAFTAR AKUN (FIREBASE AUTH)                          -->
+  <!-- ===================================================================== -->
+  <div id="auth-screen" class="no-print hidden flex-1 flex items-center justify-center p-4 sm:p-6 bg-gradient-to-br from-primary-50 via-slate-50 to-navy-50">
+    <div class="max-w-md w-full bg-white border-2 border-slate-200 rounded-3xl p-6 sm:p-8 shadow-xl">
+      
+      <!-- Pengatur Ukuran Teks di Halaman Login -->
+      <div class="flex items-center justify-center gap-1.5 mb-5 bg-slate-100 p-1.5 rounded-2xl">
+        <span class="text-xs font-bold text-slate-600 px-2">Ukuran Huruf:</span>
+        <button type="button" onclick="setFontScale('normal')" data-scale-btn="normal" class="scale-btn px-2.5 py-1.5 rounded-xl text-xs font-bold bg-white text-primary-800 shadow-2xs cursor-pointer">Normal</button>
+        <button type="button" onclick="setFontScale('large')" data-scale-btn="large" class="scale-btn px-2.5 py-1.5 rounded-xl text-xs font-bold text-slate-600 cursor-pointer">Besar</button>
+        <button type="button" onclick="setFontScale('xlarge')" data-scale-btn="xlarge" class="scale-btn px-2.5 py-1.5 rounded-xl text-xs font-bold text-slate-600 cursor-pointer">Ekstra Besar</button>
+      </div>
+
+      <div class="text-center mb-6">
+        <div class="w-16 h-16 bg-primary-700 text-white rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-md">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-9 h-9" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+          </svg>
+        </div>
+        <h1 class="text-2xl font-extrabold text-slate-900">Jurnal & Monitoring PKL</h1>
+        <p class="text-sm text-slate-600 mt-1.5 leading-relaxed">
+          Catat kegiatan harian, foto dokumentasi, paraf pembimbing, hingga cetak laporan resmi dari <strong>HP maupun Laptop</strong>.
+        </p>
+      </div>
+
+      <!-- Tab Login / Register -->
+      <div class="grid grid-cols-2 gap-2 bg-slate-100 p-1.5 rounded-2xl mb-5">
+        <button type="button" id="tab-login" onclick="switchAuthTab('login')" class="py-2.5 rounded-xl font-bold text-sm bg-white text-primary-800 shadow-2xs transition cursor-pointer">
+          Masuk Akun
+        </button>
+        <button type="button" id="tab-register" onclick="switchAuthTab('register')" class="py-2.5 rounded-xl font-bold text-sm text-slate-600 hover:text-slate-900 transition cursor-pointer">
+          Daftar Baru
+        </button>
+      </div>
+
+      <form onsubmit="handleEmailAuth(event)" class="space-y-4">
+        <div>
+          <label for="auth-email" class="block text-sm font-bold text-slate-800 mb-1">Alamat Email</label>
+          <input type="email" id="auth-email" required autocomplete="email" placeholder="contoh: nama.siswa@gmail.com"
+            class="w-full px-4 py-3 bg-slate-50 border-2 border-slate-300 rounded-xl focus:bg-white focus:border-primary-600 focus:outline-none">
+        </div>
+        <div>
+          <label for="auth-password" class="block text-sm font-bold text-slate-800 mb-1">Kata Sandi</label>
+          <input type="password" id="auth-password" required minlength="6" autocomplete="current-password" placeholder="Minimal 6 karakter"
+            class="w-full px-4 py-3 bg-slate-50 border-2 border-slate-300 rounded-xl focus:bg-white focus:border-primary-600 focus:outline-none">
+        </div>
+
+        <div id="auth-error-box" class="hidden bg-rose-50 border-2 border-rose-200 text-rose-800 rounded-xl p-3 text-sm font-semibold"></div>
+
+        <button type="submit" id="auth-submit-btn"
+          class="w-full py-3.5 bg-primary-700 hover:bg-primary-800 text-white font-extrabold rounded-2xl shadow-md transition cursor-pointer">
+          Masuk ke Jurnal PKL
+        </button>
+      </form>
+
+      <div class="relative my-5">
+        <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-slate-300"></div></div>
+        <div class="relative flex justify-center text-xs"><span class="px-3 bg-white text-slate-500 font-bold">atau metode lain</span></div>
+      </div>
+
+      <div class="space-y-2.5">
+        <button type="button" onclick="handleGoogleLogin()"
+          class="w-full py-3 px-4 bg-white hover:bg-slate-50 text-slate-800 border-2 border-slate-300 font-bold text-sm rounded-2xl flex items-center justify-center gap-2.5 transition cursor-pointer">
+          <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24">
+            <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"/>
+            <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.11-6.72-4.96H1.29v3.14C3.26 21.3 7.31 24 12 24z"/>
+            <path fill="#FBBC05" d="M5.28 14.24c-.24-.72-.38-1.49-.38-2.24s.14-1.52.38-2.24V6.62H1.29C.47 8.24 0 10.06 0 12s.47 3.76 1.29 5.38l3.99-3.14z"/>
+            <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.31 0 3.26 2.7 1.29 6.62l3.99 3.14c.95-2.85 3.6-4.96 6.72-4.96z"/>
+          </svg>
+          <span>Masuk dengan Akun Google</span>
+        </button>
+
+        <button type="button" onclick="handleGuestLogin()"
+          class="w-full py-2.5 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs rounded-xl transition cursor-pointer">
+          Masuk Cepat Tanpa Daftar (Mode Demo / Satu Perangkat)
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- 4. APLIKASI UTAMA (HEADER AKSESIBEL + 4 TAB NAVIGASI LENGKAP)          -->
+  <!-- ===================================================================== -->
+  <div id="app-screen" class="no-print hidden flex-1 flex flex-col pb-24 md:pb-8">
+
+    <!-- HEADER UTAMA STICKY -->
+    <header class="bg-navy-900 text-white sticky top-0 z-30 shadow-md">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 py-3">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          
+          <!-- Brand & Status Cloud -->
+          <div class="flex items-center gap-3 min-w-0">
+            <div class="bg-primary-600 text-white p-2.5 rounded-xl shrink-0">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+              </svg>
+            </div>
+            <div class="min-w-0">
+              <h1 class="text-base sm:text-lg font-extrabold tracking-tight truncate">Buku Jurnal & Monitoring PKL</h1>
+              <div class="flex items-center gap-2 text-xs text-slate-300">
+                <span id="cloud-indicator-dot" class="w-2 h-2 rounded-full bg-emerald-400 shrink-0"></span>
+                <span id="user-account-label" class="truncate">Tersimpan di Cloud</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Pengatur Ukuran Huruf (Aksesibilitas Semua Usia) & Tombol Keluar -->
+          <div class="flex flex-wrap items-center gap-2">
+            <div class="flex items-center bg-slate-800 p-1 rounded-xl border border-slate-700" role="group" aria-label="Pengatur Ukuran Teks">
+              <button type="button" onclick="setFontScale('normal')" data-scale-btn="normal"
+                class="scale-btn px-2.5 py-1.5 rounded-lg text-xs font-bold bg-primary-600 text-white transition cursor-pointer">
+                Teks Normal
+              </button>
+              <button type="button" onclick="setFontScale('large')" data-scale-btn="large"
+                class="scale-btn px-2.5 py-1.5 rounded-lg text-xs font-bold text-slate-300 hover:text-white transition cursor-pointer">
+                Teks Besar
+              </button>
+              <button type="button" onclick="setFontScale('xlarge')" data-scale-btn="xlarge"
+                class="scale-btn px-2.5 py-1.5 rounded-lg text-xs font-bold text-slate-300 hover:text-white transition cursor-pointer">
+                Teks Ekstra Besar
+              </button>
+            </div>
+
+            <button type="button" onclick="handleLogout()"
+              class="inline-flex items-center gap-1.5 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold px-3 py-2 rounded-xl transition cursor-pointer">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+              </svg>
+              <span>Keluar</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- NAVIGASI TAB DESKTOP (Tampil di layar menengah ke atas) -->
+        <nav aria-label="Menu Utama Desktop" class="hidden md:grid grid-cols-4 gap-2 mt-3 pt-3 border-t border-slate-800">
+          <button type="button" onclick="switchTab('beranda')" data-tab-target="beranda"
+            class="nav-tab-desktop flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl font-bold text-sm bg-primary-600 text-white transition cursor-pointer">
+            <span>🏠 1. Beranda & Input Jurnal</span>
+          </button>
+          <button type="button" onclick="switchTab('riwayat')" data-tab-target="riwayat"
+            class="nav-tab-desktop flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl font-bold text-sm text-slate-300 hover:bg-slate-800 transition cursor-pointer">
+            <span>📋 2. Riwayat Kegiatan (<span class="badge-total-count">0</span>)</span>
+          </button>
+          <button type="button" onclick="switchTab('penilaian')" data-tab-target="penilaian"
+            class="nav-tab-desktop flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl font-bold text-sm text-slate-300 hover:bg-slate-800 transition cursor-pointer">
+            <span>⭐ 3. Penilaian & Evaluasi</span>
+          </button>
+          <button type="button" onclick="switchTab('profil')" data-tab-target="profil"
+            class="nav-tab-desktop flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl font-bold text-sm text-slate-300 hover:bg-slate-800 transition cursor-pointer">
+            <span>🖨️ 4. Profil & Cetak Laporan</span>
+          </button>
+        </nav>
+      </div>
+    </header>
+
+    <!-- KONTEN UTAMA -->
+    <main class="max-w-6xl w-full mx-auto px-4 sm:px-6 py-6 space-y-6 flex-1">
+
+      <!-- ================================================================= -->
+      <!-- TAB 1: BERANDA RINGKASAN & INPUT JURNAL HARIAN                    -->
+      <!-- ================================================================= -->
+      <div id="view-beranda" class="tab-view space-y-6">
+
+        <!-- KARTU IDENTITAS SINGKAT & PROGRESS BAR TARGET PKL -->
+        <section class="bg-white border-2 border-slate-200 rounded-3xl p-5 sm:p-6 shadow-2xs">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-200">
+            <div>
+              <span class="inline-block text-xs font-extrabold uppercase tracking-wider text-primary-800 bg-primary-100 px-3 py-1 rounded-full mb-1.5">
+                Peserta PKL Aktif
+              </span>
+              <h2 class="text-xl sm:text-2xl font-extrabold text-slate-900" id="dash-nama-siswa">-</h2>
+              <p class="text-sm text-slate-600 mt-0.5">
+                <span id="dash-sekolah-siswa">-</span> &bull; Penempatan: <strong class="text-slate-800" id="dash-tempat-siswa">-</strong>
+              </p>
+            </div>
+            <button type="button" onclick="switchTab('profil')"
+              class="self-start sm:self-center inline-flex items-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-sm px-4 py-2.5 rounded-xl border border-slate-300 transition cursor-pointer">
+              <span>⚙️ Ubah Profil & Target</span>
+            </button>
+          </div>
+
+          <!-- Progress Bar Target PKL -->
+          <div class="mt-4">
+            <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+              <span class="text-sm font-extrabold text-slate-800">Pencapaian Target Hari Kerja PKL</span>
+              <span class="text-sm font-extrabold text-primary-800" id="progress-label-text">0 / 60 Hari Kerja (0%)</span>
+            </div>
+            <div class="w-full h-5 bg-slate-100 rounded-full overflow-hidden border border-slate-300 p-0.5">
+              <div id="progress-bar-fill" class="h-full bg-gradient-to-r from-primary-600 to-emerald-500 rounded-full transition-all duration-500" style="width: 0%"></div>
+            </div>
+            <p class="text-xs text-slate-600 mt-2">
+              Periode PKL: <strong id="dash-periode-text">-</strong> &bull; Total Akumulasi Waktu Kerja: <strong class="text-primary-800" id="dash-jam-text">0 Jam 0 Menit</strong>
+            </p>
+          </div>
+        </section>
+
+        <!-- 5 KARTU STATISTIK BESAR & BERWARNA LEMBUT -->
+        <section aria-label="Statistik Kehadiran dan Jurnal PKL">
+          <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
+            <!-- 1. Total Hadir -->
+            <div class="bg-blue-50 border-2 border-blue-200 rounded-2xl p-4 shadow-2xs">
+              <span class="block text-xs font-extrabold uppercase text-blue-800">Total Hadir</span>
+              <div class="text-2xl sm:text-3xl font-extrabold text-blue-950 mt-1" id="stat-hadir">0</div>
+              <span class="block text-xs font-semibold text-blue-700 mt-0.5">Hari Lokasi / WFH</span>
+            </div>
+
+            <!-- 2. Total Jam Kerja -->
+            <div class="bg-teal-50 border-2 border-teal-200 rounded-2xl p-4 shadow-2xs">
+              <span class="block text-xs font-extrabold uppercase text-teal-800">Total Jam Kerja</span>
+              <div class="text-2xl sm:text-3xl font-extrabold text-teal-950 mt-1" id="stat-jam">0j</div>
+              <span class="block text-xs font-semibold text-teal-700 mt-0.5" id="stat-menit-sub">0 Menit tercatat</span>
+            </div>
+
+            <!-- 3. Sudah Diparaf -->
+            <div class="bg-emerald-50 border-2 border-emerald-200 rounded-2xl p-4 shadow-2xs">
+              <span class="block text-xs font-extrabold uppercase text-emerald-800">Sudah Diparaf</span>
+              <div class="text-2xl sm:text-3xl font-extrabold text-emerald-950 mt-1" id="stat-approved">0</div>
+              <span class="block text-xs font-semibold text-emerald-700 mt-0.5">Disetujui Pembimbing</span>
+            </div>
+
+            <!-- 4. Menunggu Paraf -->
+            <div class="bg-amber-50 border-2 border-amber-200 rounded-2xl p-4 shadow-2xs">
+              <span class="block text-xs font-extrabold uppercase text-amber-800">Menunggu Paraf</span>
+              <div class="text-2xl sm:text-3xl font-extrabold text-amber-950 mt-1" id="stat-pending">0</div>
+              <span class="block text-xs font-semibold text-amber-700 mt-0.5">Perlu Verifikasi</span>
+            </div>
+
+            <!-- 5. Izin / Sakit -->
+            <div class="col-span-2 sm:col-span-1 bg-rose-50 border-2 border-rose-200 rounded-2xl p-4 shadow-2xs">
+              <span class="block text-xs font-extrabold uppercase text-rose-800">Izin / Sakit</span>
+              <div class="text-2xl sm:text-3xl font-extrabold text-rose-950 mt-1" id="stat-izin">0</div>
+              <span class="block text-xs font-semibold text-rose-700 mt-0.5">Hari Tidak Masuk</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- FORMULIR JURNAL HARIAN SUPER LENGKAP -->
+        <section id="journal-form-section" class="bg-white border-2 border-slate-200 rounded-3xl p-5 sm:p-7 shadow-2xs">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 mb-6 border-b-2 border-slate-100">
+            <div class="flex items-center gap-3">
+              <div class="w-11 h-11 rounded-2xl bg-primary-700 text-white flex items-center justify-center font-extrabold text-2xl shrink-0">+</div>
+              <div>
+                <h2 id="form-heading" class="text-xl font-extrabold text-slate-900">Catat Jurnal Kegiatan Harian</h2>
+                <p class="text-sm text-slate-600">Lengkapi setiap bagian di bawah ini secara berurutan</p>
+              </div>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-2">
+              <button type="button" onclick="fillExampleJournal()"
+                class="inline-flex items-center gap-1.5 bg-navy-50 hover:bg-navy-100 text-navy-800 border border-navy-200 font-bold text-sm px-3.5 py-2.5 rounded-xl transition cursor-pointer">
+                <span>✨ Isi Contoh Otomatis</span>
+              </button>
+              <button type="button" id="btn-cancel-edit" onclick="resetJournalForm()"
+                class="hidden inline-flex items-center gap-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-bold text-sm px-3.5 py-2.5 rounded-xl transition cursor-pointer">
+                <span>Batal Edit</span>
+              </button>
+            </div>
+          </div>
+
+          <form id="journal-form" onsubmit="handleJournalSubmit(event)" class="space-y-6">
+            <input type="hidden" id="entry-id" value="">
+
+            <!-- BLOK 1: WAKTU & STATUS KEHADIRAN -->
+            <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 sm:p-5 space-y-4">
+              <h3 class="text-base font-extrabold text-navy-900 flex items-center gap-2">
+                <span class="w-6 h-6 rounded-full bg-navy-800 text-white text-xs flex items-center justify-center">1</span>
+                <span>Tanggal, Kehadiran & Jam Kerja</span>
+              </h3>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div>
+                  <label for="f-date" class="block text-sm font-bold text-slate-800 mb-1">Tanggal Kegiatan <span class="text-rose-600">*</span></label>
+                  <input type="date" id="f-date" required class="w-full px-3.5 py-3 bg-white border-2 border-slate-300 rounded-xl focus:border-primary-600 focus:outline-none">
+                </div>
+
+                <div>
+                  <label for="f-attendance" class="block text-sm font-bold text-slate-800 mb-1">Status Kehadiran <span class="text-rose-600">*</span></label>
+                  <select id="f-attendance" onchange="updateDurationPreview()" required class="w-full px-3.5 py-3 bg-white border-2 border-slate-300 rounded-xl focus:border-primary-600 focus:outline-none font-semibold">
+                    <option value="Hadir di Lokasi">🏢 Hadir di Lokasi (WFO)</option>
+                    <option value="Daring/WFH">💻 Daring / Kerja dari Rumah (WFH)</option>
+                    <option value="Izin">📄 Izin (Dengan Keterangan)</option>
+                    <option value="Sakit">🏥 Sakit (Dengan Surat/Keterangan)</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label for="f-start" class="block text-sm font-bold text-slate-800 mb-1">Jam Masuk <span class="text-rose-600">*</span></label>
+                  <input type="time" id="f-start" value="08:00" onchange="updateDurationPreview()" required class="w-full px-3.5 py-3 bg-white border-2 border-slate-300 rounded-xl focus:border-primary-600 focus:outline-none">
+                </div>
+
+                <div>
+                  <label for="f-end" class="block text-sm font-bold text-slate-800 mb-1">Jam Pulang <span class="text-rose-600">*</span></label>
+                  <input type="time" id="f-end" value="16:00" onchange="updateDurationPreview()" required class="w-full px-3.5 py-3 bg-white border-2 border-slate-300 rounded-xl focus:border-primary-600 focus:outline-none">
+                </div>
+              </div>
+
+              <!-- Info Durasi Otomatis -->
+              <div class="flex flex-wrap items-center justify-between gap-2 bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-sm">
+                <span class="font-semibold text-slate-600">Durasi Kerja Terhitung Otomatis:</span>
+                <span id="duration-preview-badge" class="font-extrabold text-primary-800 bg-primary-50 px-3 py-1 rounded-lg border border-primary-200">
+                  8 Jam 0 Menit
+                </span>
+              </div>
+            </div>
+
+            <!-- BLOK 2: DETAIL AKTIVITAS PEKERJAAN -->
+            <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 sm:p-5 space-y-4">
+              <h3 class="text-base font-extrabold text-navy-900 flex items-center gap-2">
+                <span class="w-6 h-6 rounded-full bg-navy-800 text-white text-xs flex items-center justify-center">2</span>
+                <span>Uraian Pekerjaan & Pembelajaran</span>
+              </h3>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label for="f-division" class="block text-sm font-bold text-slate-800 mb-1">Divisi / Bagian Penempatan <span class="text-rose-600">*</span></label>
+                  <input type="text" id="f-division" required placeholder="Contoh: Administrasi Umum / IT Support"
+                    class="w-full px-3.5 py-3 bg-white border-2 border-slate-300 rounded-xl focus:border-primary-600 focus:outline-none">
+                </div>
+
+                <div>
+                  <label for="f-title" class="block text-sm font-bold text-slate-800 mb-1">Judul Kegiatan Utama <span class="text-rose-600">*</span></label>
+                  <input type="text" id="f-title" required placeholder="Contoh: Rekapitulasi Data Inventaris Barang"
+                    class="w-full px-3.5 py-3 bg-white border-2 border-slate-300 rounded-xl focus:border-primary-600 focus:outline-none">
+                </div>
+              </div>
+
+              <div>
+                <label for="f-desc" class="block text-sm font-bold text-slate-800 mb-1">Uraian Detail Kegiatan <span class="text-rose-600">*</span></label>
+                <textarea id="f-desc" rows="4" required placeholder="Jelaskan langkah kerja yang Anda lakukan hari ini secara jelas dan runtut..."
+                  class="w-full px-3.5 py-3 bg-white border-2 border-slate-300 rounded-xl focus:border-primary-600 focus:outline-none leading-relaxed"></textarea>
+              </div>
+
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <label for="f-tools" class="block text-sm font-bold text-slate-800 mb-1">Alat / Bahan / Aplikasi</label>
+                  <input type="text" id="f-tools" placeholder="Contoh: Komputer, Ms. Excel, Scanner"
+                    class="w-full px-3.5 py-3 bg-white border-2 border-slate-300 rounded-xl focus:border-primary-600 focus:outline-none">
+                </div>
+
+                <div>
+                  <label for="f-obstacle" class="block text-sm font-bold text-slate-800 mb-1">Kendala & Solusinya</label>
+                  <input type="text" id="f-obstacle" placeholder="Contoh: Format rumus error, dibantu pembimbing"
+                    class="w-full px-3.5 py-3 bg-white border-2 border-slate-300 rounded-xl focus:border-primary-600 focus:outline-none">
+                </div>
+
+                <div>
+                  <label for="f-skill" class="block text-sm font-bold text-slate-800 mb-1">Ilmu / Kompetensi Baru</label>
+                  <input type="text" id="f-skill" placeholder="Contoh: Menguasai fungsi VLOOKUP & pengarsipan"
+                    class="w-full px-3.5 py-3 bg-white border-2 border-slate-300 rounded-xl focus:border-primary-600 focus:outline-none">
+                </div>
+              </div>
+            </div>
+
+            <!-- BLOK 3: UNGGAH FOTO DOKUMENTASI KEGIATAN -->
+            <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 sm:p-5 space-y-3">
+              <h3 class="text-base font-extrabold text-navy-900 flex items-center gap-2">
+                <span class="w-6 h-6 rounded-full bg-navy-800 text-white text-xs flex items-center justify-center">3</span>
+                <span>Foto Dokumentasi Kegiatan (Opsional)</span>
+              </h3>
+              <p class="text-xs text-slate-600">
+                Ambil foto langsung dari kamera HP atau pilih dari galeri. Sistem akan otomatis mengecilkan ukuran foto (&lt;120KB) agar cepat tersimpan.
+              </p>
+
+              <div class="flex flex-col sm:flex-row sm:items-center gap-4">
+                <label for="f-photo-input"
+                  class="inline-flex items-center justify-center gap-2 bg-white hover:bg-primary-50 text-primary-800 border-2 border-dashed border-primary-400 font-bold text-sm px-5 py-3.5 rounded-2xl cursor-pointer transition">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                  <span>📷 Pilih / Ambil Foto Kegiatan</span>
+                </label>
+                <input type="file" id="f-photo-input" accept="image/*" class="hidden" onchange="handlePhotoUpload(event)">
+                <span id="photo-status-text" class="text-xs font-semibold text-slate-500">Belum ada foto dipilih</span>
+              </div>
+
+              <!-- Pratinjau Foto -->
+              <div id="photo-preview-wrapper" class="hidden pt-2">
+                <div class="relative inline-block border-2 border-slate-300 rounded-2xl overflow-hidden bg-white p-1.5 shadow-2xs">
+                  <img id="photo-preview-img" src="" alt="Pratinjau Foto Dokumentasi" class="max-h-48 w-auto rounded-xl object-contain">
+                  <button type="button" onclick="removeSelectedPhoto()"
+                    class="mt-2 w-full py-2 bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs rounded-xl transition cursor-pointer">
+                    🗑️ Hapus Foto Ini
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- BLOK 4: VERIFIKASI & CATATAN PEMBIMBING -->
+            <div class="bg-amber-50/70 border border-amber-200 rounded-2xl p-4 sm:p-5 space-y-4">
+              <h3 class="text-base font-extrabold text-amber-950 flex items-center gap-2">
+                <span class="w-6 h-6 rounded-full bg-amber-700 text-white text-xs flex items-center justify-center">4</span>
+                <span>Status Paraf & Catatan Pembimbing</span>
+              </h3>
+
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label for="f-approval-status" class="block text-sm font-bold text-slate-800 mb-1">Status Verifikasi / Paraf</label>
+                  <select id="f-approval-status" class="w-full px-3.5 py-3 bg-white border-2 border-slate-300 rounded-xl focus:border-primary-600 focus:outline-none font-semibold">
+                    <option value="Menunggu Paraf">⏳ Menunggu Paraf</option>
+                    <option value="Diparaf Pembimbing Lapangan">✔️ Diparaf Pembimbing Lapangan</option>
+                    <option value="Disahkan Guru Pembimbing">🏅 Disahkan Guru Pembimbing</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label for="f-supervisor-note" class="block text-sm font-bold text-slate-800 mb-1">Catatan / Umpan Balik Pembimbing</label>
+                  <input type="text" id="f-supervisor-note" placeholder="Diisi pembimbing (opsional)"
+                    class="w-full px-3.5 py-3 bg-white border-2 border-slate-300 rounded-xl focus:border-primary-600 focus:outline-none">
+                </div>
+              </div>
+            </div>
+
+            <!-- TOMBOL SIMPAN UTAMA -->
+            <div class="pt-1">
+              <button type="submit" id="btn-save-journal"
+                class="w-full flex items-center justify-center gap-3 bg-primary-700 hover:bg-primary-800 active:bg-primary-900 text-white font-extrabold text-lg px-6 py-4 rounded-2xl shadow-lg transition cursor-pointer">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                </svg>
+                <span id="btn-save-journal-text">Simpan Jurnal Kegiatan</span>
+              </button>
+            </div>
+          </form>
+        </section>
+
+        <!-- PRATINJAU 3 KEGIATAN TERAKHIR DI BERANDA -->
+        <section class="bg-white border-2 border-slate-200 rounded-3xl p-5 sm:p-6 shadow-2xs">
+          <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+            <div>
+              <h3 class="text-lg font-extrabold text-slate-900">Catatan Terbaru Anda</h3>
+              <p class="text-xs text-slate-600">Menampilkan 3 catatan terakhir yang tersimpan di cloud</p>
+            </div>
+            <button type="button" onclick="switchTab('riwayat')"
+              class="text-sm font-extrabold text-primary-700 hover:text-primary-900 underline cursor-pointer">
+              Lihat Semua Riwayat (<span class="badge-total-count">0</span>) &rarr;
+            </button>
+          </div>
+          <div id="recent-entries-preview" class="space-y-3"></div>
+        </section>
+      </div>
+
+      <!-- ================================================================= -->
+      <!-- TAB 2: RIWAYAT KEGIATAN (LOGBOOK) & MODE VERIFIKASI PEMBIMBING    -->
+      <!-- ================================================================= -->
+      <div id="view-riwayat" class="tab-view hidden space-y-6">
+        
+        <!-- Panel Pencarian, Filter & Urutan -->
+        <section class="bg-white border-2 border-slate-200 rounded-3xl p-5 sm:p-6 shadow-2xs space-y-4">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div>
+              <h2 class="text-xl font-extrabold text-slate-900">Riwayat & Verifikasi Jurnal PKL</h2>
+              <p class="text-sm text-slate-600">Cari catatan, filter status paraf, atau berikan paraf pembimbing langsung</p>
+            </div>
+            <button type="button" onclick="switchTab('beranda')"
+              class="self-start sm:self-center inline-flex items-center gap-1.5 bg-primary-700 hover:bg-primary-800 text-white font-bold text-sm px-4 py-2.5 rounded-xl transition cursor-pointer">
+              <span>+ Tambah Jurnal Baru</span>
+            </button>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3">
+            <!-- Pencarian Kata Kunci -->
+            <div class="lg:col-span-4 relative">
+              <label for="filter-search" class="sr-only">Cari Kegiatan</label>
+              <input type="text" id="filter-search" oninput="renderLogbookList()" placeholder="🔍 Cari judul, uraian, alat, divisi..."
+                class="w-full px-4 py-3 bg-slate-50 border-2 border-slate-300 rounded-xl focus:bg-white focus:border-primary-600 focus:outline-none">
+            </div>
+
+            <!-- Filter Status Paraf -->
+            <div class="lg:col-span-3">
+              <label for="filter-approval" class="sr-only">Filter Status Paraf</label>
+              <select id="filter-approval" onchange="renderLogbookList()"
+                class="w-full px-3.5 py-3 bg-slate-50 border-2 border-slate-300 rounded-xl focus:bg-white focus:border-primary-600 focus:outline-none font-semibold">
+                <option value="ALL">Semua Status Paraf</option>
+                <option value="Menunggu Paraf">⏳ Menunggu Paraf</option>
+                <option value="Diparaf Pembimbing Lapangan">✔️ Diparaf Pemb. Lapangan</option>
+                <option value="Disahkan Guru Pembimbing">🏅 Disahkan Guru Pemb.</option>
+              </select>
+            </div>
+
+            <!-- Filter Kehadiran -->
+            <div class="lg:col-span-2">
+              <label for="filter-attendance" class="sr-only">Filter Kehadiran</label>
+              <select id="filter-attendance" onchange="renderLogbookList()"
+                class="w-full px-3.5 py-3 bg-slate-50 border-2 border-slate-300 rounded-xl focus:bg-white focus:border-primary-600 focus:outline-none font-semibold">
+                <option value="ALL">Semua Kehadiran</option>
+                <option value="Hadir di Lokasi">Hadir di Lokasi</option>
+                <option value="Daring/WFH">Daring/WFH</option>
+                <option value="Izin">Izin</option>
+                <option value="Sakit">Sakit</option>
+              </select>
+            </div>
+
+            <!-- Filter Bulan -->
+            <div class="lg:col-span-2">
+              <label for="filter-month" class="sr-only">Filter Bulan</label>
+              <select id="filter-month" onchange="renderLogbookList()"
+                class="w-full px-3.5 py-3 bg-slate-50 border-2 border-slate-300 rounded-xl focus:bg-white focus:border-primary-600 focus:outline-none font-semibold">
+                <option value="ALL">Semua Bulan</option>
+              </select>
+            </div>
+
+            <!-- Urutan Terbaru / Terlama -->
+            <div class="lg:col-span-1">
+              <label for="filter-sort" class="sr-only">Urutan</label>
+              <select id="filter-sort" onchange="renderLogbookList()" title="Urutkan Tanggal"
+                class="w-full px-2.5 py-3 bg-slate-50 border-2 border-slate-300 rounded-xl focus:bg-white focus:border-primary-600 focus:outline-none font-semibold">
+                <option value="DESC">Terbaru</option>
+                <option value="ASC">Terlama</option>
+              </select>
+            </div>
+          </div>
+        </section>
+
+        <!-- Daftar Kartu Jurnal -->
+        <div id="logbook-cards-container" class="space-y-4"></div>
+      </div>
+
+      <!-- ================================================================= -->
+      <!-- TAB 3: PENILAIAN & EVALUASI AKHIR PKL                             -->
+      <!-- ================================================================= -->
+      <div id="view-penilaian" class="tab-view hidden space-y-6">
+        <section class="bg-white border-2 border-slate-200 rounded-3xl p-5 sm:p-7 shadow-2xs">
+          <div class="border-b-2 border-slate-100 pb-4 mb-6">
+            <span class="inline-block text-xs font-extrabold uppercase tracking-wider text-amber-900 bg-amber-100 px-3 py-1 rounded-full mb-1.5">
+              Lembar Evaluasi Pembimbing
+            </span>
+            <h2 class="text-xl sm:text-2xl font-extrabold text-slate-900">Penilaian & Evaluasi Akhir PKL</h2>
+            <p class="text-sm text-slate-600 mt-1">
+              Diisi oleh Pembimbing Lapangan atau Guru Pembimbing. Nilai otomatis dihitung dan ikut tercetak pada Laporan Resmi PKL.
+            </p>
+          </div>
+
+          <form onsubmit="saveEvaluationData(event)" class="space-y-6">
+            <!-- Kartu Ringkasan Nilai Rata-Rata Live -->
+            <div class="bg-gradient-to-r from-navy-900 to-primary-900 text-white rounded-2xl p-5 flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div>
+                <p class="text-xs uppercase tracking-wider text-slate-300 font-bold">Nilai Rata-Rata Akhir PKL</p>
+                <div class="flex items-baseline gap-3 mt-1">
+                  <span id="eval-avg-display" class="text-4xl font-extrabold">0.0</span>
+                  <span class="text-sm text-slate-300">/ 100</span>
+                </div>
+              </div>
+              <div class="text-center sm:text-right">
+                <span class="block text-xs uppercase tracking-wider text-slate-300 font-bold mb-1">Predikat Kelulusan</span>
+                <span id="eval-predikat-badge" class="inline-block bg-white text-slate-900 font-extrabold text-base px-4 py-1.5 rounded-xl">
+                  Belum Dinilai
+                </span>
+              </div>
+            </div>
+
+            <!-- 5 Aspek Penilaian (0 - 100) -->
+            <div class="space-y-4">
+              <!-- Aspek 1 -->
+              <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div>
+                  <label for="eval-1" class="block text-base font-extrabold text-slate-900">1. Disiplin & Kehadiran</label>
+                  <p class="text-xs text-slate-600">Ketepatan waktu datang/pulang, kepatuhan tata tertib instansi.</p>
+                </div>
+                <div class="flex items-center gap-3 shrink-0">
+                  <input type="number" id="eval-1" min="0" max="100" required oninput="recalculateEvaluation()"
+                    class="w-28 px-3.5 py-3 bg-white border-2 border-slate-300 rounded-xl font-extrabold text-center focus:border-primary-600 focus:outline-none">
+                  <span id="eval-pred-1" class="w-24 text-center text-xs font-bold px-2.5 py-2 rounded-lg bg-slate-200 text-slate-700">-</span>
+                </div>
+              </div>
+
+              <!-- Aspek 2 -->
+              <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div>
+                  <label for="eval-2" class="block text-base font-extrabold text-slate-900">2. Tanggung Jawab Pekerjaan</label>
+                  <p class="text-xs text-slate-600">Ketuntasan menyelesaikan tugas yang diberikan sesuai instruksi.</p>
+                </div>
+                <div class="flex items-center gap-3 shrink-0">
+                  <input type="number" id="eval-2" min="0" max="100" required oninput="recalculateEvaluation()"
+                    class="w-28 px-3.5 py-3 bg-white border-2 border-slate-300 rounded-xl font-extrabold text-center focus:border-primary-600 focus:outline-none">
+                  <span id="eval-pred-2" class="w-24 text-center text-xs font-bold px-2.5 py-2 rounded-lg bg-slate-200 text-slate-700">-</span>
+                </div>
+              </div>
+
+              <!-- Aspek 3 -->
+              <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div>
+                  <label for="eval-3" class="block text-base font-extrabold text-slate-900">3. Kerjasama Tim & Komunikasi</label>
+                  <p class="text-xs text-slate-600">Sopan santun, etika berkomunikasi, dan kemampuan bekerja dalam tim.</p>
+                </div>
+                <div class="flex items-center gap-3 shrink-0">
+                  <input type="number" id="eval-3" min="0" max="100" required oninput="recalculateEvaluation()"
+                    class="w-28 px-3.5 py-3 bg-white border-2 border-slate-300 rounded-xl font-extrabold text-center focus:border-primary-600 focus:outline-none">
+                  <span id="eval-pred-3" class="w-24 text-center text-xs font-bold px-2.5 py-2 rounded-lg bg-slate-200 text-slate-700">-</span>
+                </div>
+              </div>
+
+              <!-- Aspek 4 -->
+              <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div>
+                  <label for="eval-4" class="block text-base font-extrabold text-slate-900">4. Inisiatif & Kreativitas</label>
+                  <p class="text-xs text-slate-600">Kemauan belajar hal baru, keaktifan bertanya, dan pemecahan masalah.</p>
+                </div>
+                <div class="flex items-center gap-3 shrink-0">
+                  <input type="number" id="eval-4" min="0" max="100" required oninput="recalculateEvaluation()"
+                    class="w-28 px-3.5 py-3 bg-white border-2 border-slate-300 rounded-xl font-extrabold text-center focus:border-primary-600 focus:outline-none">
+                  <span id="eval-pred-4" class="w-24 text-center text-xs font-bold px-2.5 py-2 rounded-lg bg-slate-200 text-slate-700">-</span>
+                </div>
+              </div>
+
+              <!-- Aspek 5 -->
+              <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div>
+                  <label for="eval-5" class="block text-base font-extrabold text-slate-900">5. Keterampilan Teknis / Kejuruan</label>
+                  <p class="text-xs text-slate-600">Penguasaan alat kerja, aplikasi, dan kualitas hasil pekerjaan praktik.</p>
+                </div>
+                <div class="flex items-center gap-3 shrink-0">
+                  <input type="number" id="eval-5" min="0" max="100" required oninput="recalculateEvaluation()"
+                    class="w-28 px-3.5 py-3 bg-white border-2 border-slate-300 rounded-xl font-extrabold text-center focus:border-primary-600 focus:outline-none">
+                  <span id="eval-pred-5" class="w-24 text-center text-xs font-bold px-2.5 py-2 rounded-lg bg-slate-200 text-slate-700">-</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Catatan Evaluasi Akhir -->
+            <div>
+              <label for="eval-note" class="block text-sm font-bold text-slate-800 mb-1.5">
+                Catatan Evaluasi & Rekomendasi Akhir Pembimbing Lapangan
+              </label>
+              <textarea id="eval-note" rows="4" placeholder="Tuliskan kesan, pesan, dan saran pengembangan kompetensi peserta PKL..."
+                class="w-full px-4 py-3 bg-slate-50 border-2 border-slate-300 rounded-2xl focus:bg-white focus:border-primary-600 focus:outline-none leading-relaxed"></textarea>
+            </div>
+
+            <button type="submit"
+              class="w-full flex items-center justify-center gap-2 bg-primary-700 hover:bg-primary-800 text-white font-extrabold text-lg py-4 px-6 rounded-2xl shadow-md transition cursor-pointer">
+              <span>💾 Simpan Penilaian Akhir ke Cloud</span>
+            </button>
+          </form>
+        </section>
+      </div>
+
+      <!-- ================================================================= -->
+      <!-- TAB 4: PROFIL LENGKAP, CETAK LAPORAN RESMI & CADANGAN DATA        -->
+      <!-- ================================================================= -->
+      <div id="view-profil" class="tab-view hidden space-y-6">
+        
+        <!-- Kartu Cetak Laporan Resmi & Ekspor -->
+        <section class="bg-gradient-to-br from-navy-900 to-slate-800 text-white rounded-3xl p-5 sm:p-7 shadow-md">
+          <h2 class="text-xl sm:text-2xl font-extrabold">Cetak Laporan Resmi & Cadangkan Data</h2>
+          <p class="text-sm text-slate-300 mt-1 leading-relaxed">
+            Susun otomatis dokumen laporan PKL siap jilid (Identitas, Rekap Kehadiran, Tabel Jurnal, Penilaian Akhir, & 3 Kolom Tanda Tangan) atau unduh berkas Excel & JSON.
+          </p>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mt-5">
+            <button type="button" onclick="generateOfficialPrintReport()"
+              class="flex items-center justify-center gap-2 bg-primary-600 hover:bg-primary-500 text-white font-extrabold text-sm px-4 py-4 rounded-2xl shadow-sm transition cursor-pointer">
+              <span>🖨️ Cetak Laporan / PDF</span>
+            </button>
+
+            <button type="button" onclick="exportJournalCSV()"
+              class="flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-sm px-4 py-4 rounded-2xl shadow-sm transition cursor-pointer">
+              <span>📊 Unduh Excel (.CSV)</span>
+            </button>
+
+            <button type="button" onclick="exportBackupJSON()"
+              class="flex items-center justify-center gap-2 bg-slate-700 hover:bg-slate-600 text-white font-bold text-sm px-4 py-4 rounded-2xl border border-slate-500 transition cursor-pointer">
+              <span>💾 Cadangkan (.JSON)</span>
+            </button>
+
+            <label for="import-json-file"
+              class="flex items-center justify-center gap-2 bg-slate-700 hover:bg-slate-600 text-white font-bold text-sm px-4 py-4 rounded-2xl border border-slate-500 transition cursor-pointer">
+              <span>📂 Pulihkan (.JSON)</span>
+            </label>
+            <input type="file" id="import-json-file" accept=".json,application/json" class="hidden" onchange="importBackupJSON(event)">
+          </div>
+        </section>
+
+        <!-- Formulir Profil Lengkap Peserta & Instansi -->
+        <section class="bg-white border-2 border-slate-200 rounded-3xl p-5 sm:p-7 shadow-2xs">
+          <div class="border-b-2 border-slate-100 pb-4 mb-6">
+            <h2 class="text-xl font-extrabold text-slate-900">Data Profil Peserta, Instansi & Pembimbing</h2>
+            <p class="text-sm text-slate-600 mt-1">Data ini akan tampil pada kepala laporan resmi dan lembar pengesahan tanda tangan.</p>
+          </div>
+
+          <form onsubmit="saveFullProfile(event)" class="space-y-6">
+            <!-- Data Peserta -->
+            <div class="space-y-4">
+              <h3 class="text-base font-extrabold text-primary-800 border-b border-slate-200 pb-1.5">A. Identitas Peserta PKL</h3>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label for="p-nama" class="block text-sm font-bold text-slate-800 mb-1">Nama Lengkap Peserta <span class="text-rose-600">*</span></label>
+                  <input type="text" id="p-nama" required class="w-full px-4 py-3 bg-slate-50 border-2 border-slate-300 rounded-xl focus:bg-white focus:border-primary-600 focus:outline-none">
+                </div>
+                <div>
+                  <label for="p-nis" class="block text-sm font-bold text-slate-800 mb-1">NIS / NIM <span class="text-rose-600">*</span></label>
+                  <input type="text" id="p-nis" required class="w-full px-4 py-3 bg-slate-50 border-2 border-slate-300 rounded-xl focus:bg-white focus:border-primary-600 focus:outline-none">
+                </div>
+                <div>
+                  <label for="p-jurusan" class="block text-sm font-bold text-slate-800 mb-1">Jurusan / Program Studi <span class="text-rose-600">*</span></label>
+                  <input type="text" id="p-jurusan" required class="w-full px-4 py-3 bg-slate-50 border-2 border-slate-300 rounded-xl focus:bg-white focus:border-primary-600 focus:outline-none">
+                </div>
+                <div>
+                  <label for="p-sekolah" class="block text-sm font-bold text-slate-800 mb-1">Nama Sekolah / Kampus <span class="text-rose-600">*</span></label>
+                  <input type="text" id="p-sekolah" required class="w-full px-4 py-3 bg-slate-50 border-2 border-slate-300 rounded-xl focus:bg-white focus:border-primary-600 focus:outline-none">
+                </div>
+              </div>
+            </div>
+
+            <!-- Data Instansi & Periode -->
+            <div class="space-y-4">
+              <h3 class="text-base font-extrabold text-primary-800 border-b border-slate-200 pb-1.5">B. Tempat PKL & Target Periode</h3>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label for="p-perusahaan" class="block text-sm font-bold text-slate-800 mb-1">Nama Perusahaan / Instansi PKL <span class="text-rose-600">*</span></label>
+                  <input type="text" id="p-perusahaan" required class="w-full px-4 py-3 bg-slate-50 border-2 border-slate-300 rounded-xl focus:bg-white focus:border-primary-600 focus:outline-none">
+                </div>
+                <div>
+                  <label for="p-divisi" class="block text-sm font-bold text-slate-800 mb-1">Divisi / Bagian Penempatan <span class="text-rose-600">*</span></label>
+                  <input type="text" id="p-divisi" required class="w-full px-4 py-3 bg-slate-50 border-2 border-slate-300 rounded-xl focus:bg-white focus:border-primary-600 focus:outline-none">
+                </div>
+                <div class="sm:col-span-2">
+                  <label for="p-alamat" class="block text-sm font-bold text-slate-800 mb-1">Alamat Lengkap Instansi PKL <span class="text-rose-600">*</span></label>
+                  <input type="text" id="p-alamat" required class="w-full px-4 py-3 bg-slate-50 border-2 border-slate-300 rounded-xl focus:bg-white focus:border-primary-600 focus:outline-none">
+                </div>
+                <div>
+                  <label for="p-start-date" class="block text-sm font-bold text-slate-800 mb-1">Tanggal Mulai PKL <span class="text-rose-600">*</span></label>
+                  <input type="date" id="p-start-date" required class="w-full px-4 py-3 bg-slate-50 border-2 border-slate-300 rounded-xl focus:bg-white focus:border-primary-600 focus:outline-none">
+                </div>
+                <div>
+                  <label for="p-end-date" class="block text-sm font-bold text-slate-800 mb-1">Tanggal Selesai PKL <span class="text-rose-600">*</span></label>
+                  <input type="date" id="p-end-date" required class="w-full px-4 py-3 bg-slate-50 border-2 border-slate-300 rounded-xl focus:bg-white focus:border-primary-600 focus:outline-none">
+                </div>
+                <div>
+                  <label for="p-target-days" class="block text-sm font-bold text-slate-800 mb-1">Target Jumlah Hari Kerja PKL <span class="text-rose-600">*</span></label>
+                  <input type="number" id="p-target-days" min="1" max="365" required class="w-full px-4 py-3 bg-slate-50 border-2 border-slate-300 rounded-xl focus:bg-white focus:border-primary-600 focus:outline-none">
+                </div>
+              </div>
+            </div>
+
+            <!-- Data Pembimbing -->
+            <div class="space-y-4">
+              <h3 class="text-base font-extrabold text-primary-800 border-b border-slate-200 pb-1.5">C. Pembimbing Lapangan & Guru Pembimbing</h3>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label for="p-pembimbing-nama" class="block text-sm font-bold text-slate-800 mb-1">Nama Pembimbing Lapangan <span class="text-rose-600">*</span></label>
+                  <input type="text" id="p-pembimbing-nama" required class="w-full px-4 py-3 bg-slate-50 border-2 border-slate-300 rounded-xl focus:bg-white focus:border-primary-600 focus:outline-none">
+                </div>
+                <div>
+                  <label for="p-pembimbing-nip" class="block text-sm font-bold text-slate-800 mb-1">NIP / Jabatan Pembimbing Lapangan</label>
+                  <input type="text" id="p-pembimbing-nip" class="w-full px-4 py-3 bg-slate-50 border-2 border-slate-300 rounded-xl focus:bg-white focus:border-primary-600 focus:outline-none">
+                </div>
+                <div>
+                  <label for="p-guru-nama" class="block text-sm font-bold text-slate-800 mb-1">Nama Guru / Dosen Pembimbing <span class="text-rose-600">*</span></label>
+                  <input type="text" id="p-guru-nama" required class="w-full px-4 py-3 bg-slate-50 border-2 border-slate-300 rounded-xl focus:bg-white focus:border-primary-600 focus:outline-none">
+                </div>
+                <div>
+                  <label for="p-guru-nip" class="block text-sm font-bold text-slate-800 mb-1">NIP / NIDN Guru Pembimbing</label>
+                  <input type="text" id="p-guru-nip" class="w-full px-4 py-3 bg-slate-50 border-2 border-slate-300 rounded-xl focus:bg-white focus:border-primary-600 focus:outline-none">
+                </div>
+              </div>
+            </div>
+
+            <button type="submit"
+              class="w-full flex items-center justify-center gap-2 bg-primary-700 hover:bg-primary-800 text-white font-extrabold text-lg py-4 px-6 rounded-2xl shadow-md transition cursor-pointer">
+              <span>💾 Simpan Semua Data Profil</span>
+            </button>
+          </form>
+        </section>
+      </div>
+    </main>
+
+    <!-- NAVIGASI TAB BAWAH KHUSUS LAYAR HP / MOBILE (STICKY BOTTOM) -->
+    <nav aria-label="Menu Utama Ponsel" class="md:hidden fixed bottom-0 inset-x-0 z-40 bg-white border-t-2 border-slate-200 shadow-2xl">
+      <div class="grid grid-cols-4 gap-1 p-1.5">
+        <button type="button" onclick="switchTab('beranda')" data-tab-target="beranda"
+          class="nav-tab-mobile flex flex-col items-center justify-center py-2 px-1 rounded-xl font-bold text-xs bg-primary-50 text-primary-800 transition cursor-pointer">
+          <span class="text-lg leading-none mb-1">🏠</span>
+          <span>Beranda</span>
+        </button>
+        <button type="button" onclick="switchTab('riwayat')" data-tab-target="riwayat"
+          class="nav-tab-mobile flex flex-col items-center justify-center py-2 px-1 rounded-xl font-bold text-xs text-slate-600 transition cursor-pointer">
+          <span class="text-lg leading-none mb-1">📋</span>
+          <span>Riwayat (<span class="badge-total-count">0</span>)</span>
+        </button>
+        <button type="button" onclick="switchTab('penilaian')" data-tab-target="penilaian"
+          class="nav-tab-mobile flex flex-col items-center justify-center py-2 px-1 rounded-xl font-bold text-xs text-slate-600 transition cursor-pointer">
+          <span class="text-lg leading-none mb-1">⭐</span>
+          <span>Penilaian</span>
+        </button>
+        <button type="button" onclick="switchTab('profil')" data-tab-target="profil"
+          class="nav-tab-mobile flex flex-col items-center justify-center py-2 px-1 rounded-xl font-bold text-xs text-slate-600 transition cursor-pointer">
+          <span class="text-lg leading-none mb-1">🖨️</span>
+          <span>Profil & Cetak</span>
+        </button>
+      </div>
+    </nav>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- 5. MODAL INTERAKTIF (VERIFIKASI PEMBIMBING, HAPUS, & LIGHTBOX FOTO)   -->
+  <!-- ===================================================================== -->
+
+  <!-- Modal Khusus Verifikasi & Paraf Pembimbing -->
+  <div id="verify-modal" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
+    <div class="bg-white border-2 border-slate-200 rounded-3xl max-w-lg w-full p-6 shadow-2xl my-auto">
+      <div class="flex items-center justify-between border-b border-slate-200 pb-3 mb-4">
+        <h3 class="text-xl font-extrabold text-slate-900">Verifikasi & Paraf Pembimbing</h3>
+        <button type="button" onclick="closeVerifyModal()" class="text-slate-500 hover:text-slate-900 p-2 rounded-xl cursor-pointer">✕</button>
+      </div>
+
+      <div class="bg-slate-50 border border-slate-200 rounded-2xl p-3.5 mb-4">
+        <p class="text-xs font-bold text-slate-500" id="verify-entry-date">-</p>
+        <p class="text-base font-extrabold text-slate-900 mt-0.5" id="verify-entry-title">-</p>
+      </div>
+
+      <form onsubmit="submitSupervisorVerification(event)" class="space-y-4">
+        <input type="hidden" id="verify-entry-id" value="">
+
+        <div>
+          <label for="verify-status-select" class="block text-sm font-bold text-slate-800 mb-1">Pilih Status Paraf / Pengesahan</label>
+          <select id="verify-status-select" required class="w-full px-4 py-3 bg-white border-2 border-slate-300 rounded-xl font-bold focus:border-primary-600 focus:outline-none">
+            <option value="Menunggu Paraf">⏳ Menunggu Paraf</option>
+            <option value="Diparaf Pembimbing Lapangan">✔️ Diparaf Pembimbing Lapangan</option>
+            <option value="Disahkan Guru Pembimbing">🏅 Disahkan Guru Pembimbing</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="verify-note-input" class="block text-sm font-bold text-slate-800 mb-1">Catatan / Umpan Balik untuk Peserta PKL</label>
+          <textarea id="verify-note-input" rows="3" placeholder="Contoh: Pekerjaan sudah rapi dan sesuai prosedur. Pertahankan!"
+            class="w-full px-4 py-3 bg-slate-50 border-2 border-slate-300 rounded-xl focus:bg-white focus:border-primary-600 focus:outline-none"></textarea>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3 pt-2">
+          <button type="button" onclick="closeVerifyModal()" class="py-3.5 rounded-xl font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 transition cursor-pointer">
+            Batal
+          </button>
+          <button type="submit" class="py-3.5 rounded-xl font-extrabold text-white bg-emerald-600 hover:bg-emerald-700 shadow-sm transition cursor-pointer">
+            Simpan Paraf
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal Konfirmasi Hapus Kegiatan -->
+  <div id="delete-modal" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-white border-2 border-slate-200 rounded-3xl max-w-md w-full p-6 shadow-2xl text-center">
+      <div class="w-14 h-14 bg-rose-100 text-rose-600 rounded-full flex items-center justify-center mx-auto mb-3 text-2xl font-bold">🗑️</div>
+      <h3 class="text-xl font-extrabold text-slate-900">Hapus Catatan Jurnal?</h3>
+      <p class="text-sm text-slate-600 mt-2">
+        Catatan "<strong id="delete-entry-title" class="text-slate-900"></strong>" akan dihapus permanen dari cloud.
+      </p>
+      <div class="grid grid-cols-2 gap-3 mt-6">
+        <button type="button" onclick="closeDeleteModal()" class="py-3.5 rounded-xl font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 transition cursor-pointer">
+          Batal
+        </button>
+        <button type="button" onclick="confirmDeleteEntry()" class="py-3.5 rounded-xl font-extrabold text-white bg-rose-600 hover:bg-rose-700 transition cursor-pointer">
+          Ya, Hapus
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Perbesar Foto Dokumentasi (Lightbox) -->
+  <div id="photo-modal" onclick="closePhotoModal()" class="fixed inset-0 z-50 hidden bg-slate-950/85 backdrop-blur-xs flex items-center justify-center p-4">
+    <div onclick="event.stopPropagation()" class="bg-white rounded-3xl max-w-2xl w-full p-4 shadow-2xl">
+      <div class="flex items-center justify-between pb-2 mb-3 border-b border-slate-200">
+        <h4 class="font-extrabold text-slate-900 text-base truncate pr-3" id="photo-modal-caption">Foto Dokumentasi</h4>
+        <button type="button" onclick="closePhotoModal()" class="bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold px-3 py-1.5 rounded-xl text-sm cursor-pointer">
+          Tutup ✕
+        </button>
+      </div>
+      <div class="flex justify-center bg-slate-100 rounded-2xl p-2">
+        <img id="photo-modal-img" src="" alt="Dokumentasi PKL" class="max-h-[75vh] w-auto rounded-xl object-contain">
+      </div>
+    </div>
+  </div>
+
+  <!-- Wadah Toast Notifikasi -->
+  <div id="toast-container" class="fixed bottom-20 md:bottom-6 right-4 z-50 flex flex-col gap-2 max-w-sm w-full pointer-events-none"></div>
+
+  <!-- ===================================================================== -->
+  <!-- 6. LOGIKA FRONTEND & BACKEND FIREBASE AUTH + CLOUD FIRESTORE          -->
+  <!-- ===================================================================== -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import {
+      getAuth,
+      signInWithEmailAndPassword,
+      createUserWithEmailAndPassword,
+      GoogleAuthProvider,
+      signInWithPopup,
+      signInAnonymously,
+      signInWithCustomToken,
+      onAuthStateChanged,
+      signOut
+    } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import {
+      getFirestore,
+      doc,
+      setDoc,
+      addDoc,
+      updateDoc,
+      deleteDoc,
+      onSnapshot,
+      collection
+    } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+    const appId = typeof __app_id !== 'undefined' ? __app_id : 'jurnal-pkl-terpadu';
+    const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    // Helper Tanggal Relatif (YYYY-MM-DD)
+    function getOffsetDate(days) {
+      const d = new Date();
+      d.setDate(d.getDate() + days);
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    }
+
+    // Default Profil & Evaluasi
+    const DEFAULT_PROFILE = {
+      nama: 'Ahmad Rizky Pratama',
+      nis: '202610452',
+      jurusan: 'Teknik Komputer & Jaringan / Administrasi Perkantoran',
+      sekolah: 'SMK Negeri 1 Nusantara',
+      perusahaan: 'PT Maju Bersama Sejahtera',
+      alamat: 'Jl. Jenderal Sudirman Kav. 45, Jakarta',
+      divisi: 'Operasional & Administrasi Umum',
+      startDate: getOffsetDate(-15),
+      endDate: getOffsetDate(45),
+      targetDays: 60,
+      pembimbingNama: 'Bapak Drs. Hendra Wijaya',
+      pembimbingNip: 'ID-882104',
+      guruNama: 'Ibu Siti Aminah, S.Pd.',
+      guruNip: '19840512 201001 2 014'
+    };
+
+    const DEFAULT_EVALUATION = {
+      disiplin: 90,
+      tanggungJawab: 88,
+      kerjasama: 92,
+      inisiatif: 86,
+      teknis: 89,
+      catatanAkhir: 'Peserta PKL menunjukkan kedisiplinan yang sangat baik, cepat beradaptasi dengan alur kerja instansi, serta mampu menyelesaikan tugas administrasi dan teknis dengan rapi.'
+    };
+
+    // State Global
+    let currentUser = null;
+    let authMode = 'login';
+    let currentTab = 'beranda';
+    let userProfile = { ...DEFAULT_PROFILE };
+    let userEvaluation = { ...DEFAULT_EVALUATION };
+    let journalEntries = [];
+    let currentPhotoBase64 = '';
+    let pendingDeleteId = null;
+
+    let unsubProfile = null;
+    let unsubEval = null;
+    let unsubEntries = null;
+
+    // =====================================================================
+    // PENGATUR UKURAN TEKS (AKSESIBILITAS SEMUA KALANGAN USIA)
+    // =====================================================================
+    window.setFontScale = function(scale) {
+      const htmlEl = document.documentElement;
+      if (scale === 'large') {
+        htmlEl.style.fontSize = '18.5px';
+      } else if (scale === 'xlarge') {
+        htmlEl.style.fontSize = '21px';
+      } else {
+        htmlEl.style.fontSize = '16px';
+      }
+
+      document.querySelectorAll('.scale-btn').forEach(btn => {
+        const isActive = btn.getAttribute('data-scale-btn') === scale;
+        if (btn.closest('header')) {
+          btn.className = isActive
+            ? 'scale-btn px-2.5 py-1.5 rounded-lg text-xs font-bold bg-primary-600 text-white transition cursor-pointer'
+            : 'scale-btn px-2.5 py-1.5 rounded-lg text-xs font-bold text-slate-300 hover:text-white transition cursor-pointer';
+        } else {
+          btn.className = isActive
+            ? 'scale-btn px-2.5 py-1.5 rounded-xl text-xs font-bold bg-white text-primary-800 shadow-2xs cursor-pointer'
+            : 'scale-btn px-2.5 py-1.5 rounded-xl text-xs font-bold text-slate-600 cursor-pointer';
+        }
+      });
+    };
+
+    // =====================================================================
+    // NAVIGASI 4 TAB UTAMA
+    // =====================================================================
+    window.switchTab = function(tabName) {
+      currentTab = tabName;
+      document.querySelectorAll('.tab-view').forEach(el => el.classList.add('hidden'));
+      const activeView = document.getElementById(`view-${tabName}`);
+      if (activeView) activeView.classList.remove('hidden');
+
+      // Desktop nav style
+      document.querySelectorAll('.nav-tab-desktop').forEach(btn => {
+        const active = btn.getAttribute('data-tab-target') === tabName;
+        btn.className = active
+          ? 'nav-tab-desktop flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl font-bold text-sm bg-primary-600 text-white transition cursor-pointer'
+          : 'nav-tab-desktop flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl font-bold text-sm text-slate-300 hover:bg-slate-800 transition cursor-pointer';
+      });
+
+      // Mobile nav style
+      document.querySelectorAll('.nav-tab-mobile').forEach(btn => {
+        const active = btn.getAttribute('data-tab-target') === tabName;
+        btn.className = active
+          ? 'nav-tab-mobile flex flex-col items-center justify-center py-2 px-1 rounded-xl font-bold text-xs bg-primary-50 text-primary-800 transition cursor-pointer'
+          : 'nav-tab-mobile flex flex-col items-center justify-center py-2 px-1 rounded-xl font-bold text-xs text-slate-600 transition cursor-pointer';
+      });
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    // =====================================================================
+    // AUTENTIKASI FIREBASE
+    // =====================================================================
+    async function bootstrapAuth() {
+      try {
+        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+          await signInWithCustomToken(auth, __initial_auth_token);
+        }
+      } catch (e) {
+        console.error('Auth token info:', e);
+      }
+    }
+
+    onAuthStateChanged(auth, (user) => {
+      currentUser = user;
+      document.getElementById('loading-screen').classList.add('hidden');
+
+      if (unsubProfile) { unsubProfile(); unsubProfile = null; }
+      if (unsubEval) { unsubEval(); unsubEval = null; }
+      if (unsubEntries) { unsubEntries(); unsubEntries = null; }
+
+      if (!user) {
+        document.getElementById('app-screen').classList.add('hidden');
+        document.getElementById('auth-screen').classList.remove('hidden');
+        return;
+      }
+
+      document.getElementById('auth-screen').classList.add('hidden');
+      document.getElementById('app-screen').classList.remove('hidden');
+
+      const labelEl = document.getElementById('user-account-label');
+      labelEl.textContent = user.isAnonymous
+        ? 'Mode Demo (Tersimpan di Cloud)'
+        : `${user.email || 'Akun Aktif'} • Tersimpan di Cloud`;
+
+      document.getElementById('f-date').value = getOffsetDate(0);
+      updateDurationPreview();
+      subscribeAllUserCollections(user.uid);
+    });
+
+    bootstrapAuth();
+
+    window.switchAuthTab = function(mode) {
+      authMode = mode;
+      const tLogin = document.getElementById('tab-login');
+      const tReg = document.getElementById('tab-register');
+      const btn = document.getElementById('auth-submit-btn');
+      document.getElementById('auth-error-box').classList.add('hidden');
+
+      if (mode === 'login') {
+        tLogin.className = 'py-2.5 rounded-xl font-bold text-sm bg-white text-primary-800 shadow-2xs transition cursor-pointer';
+        tReg.className = 'py-2.5 rounded-xl font-bold text-sm text-slate-600 hover:text-slate-900 transition cursor-pointer';
+        btn.textContent = 'Masuk ke Jurnal PKL';
+      } else {
+        tReg.className = 'py-2.5 rounded-xl font-bold text-sm bg-white text-primary-800 shadow-2xs transition cursor-pointer';
+        tLogin.className = 'py-2.5 rounded-xl font-bold text-sm text-slate-600 hover:text-slate-900 transition cursor-pointer';
+        btn.textContent = 'Buat Akun Baru & Masuk';
+      }
+    };
+
+    window.handleEmailAuth = async function(e) {
+      e.preventDefault();
+      const email = document.getElementById('auth-email').value.trim();
+      const pass = document.getElementById('auth-password').value;
+      const errBox = document.getElementById('auth-error-box');
+      const btn = document.getElementById('auth-submit-btn');
+      errBox.classList.add('hidden');
+      btn.disabled = true;
+
+      try {
+        if (authMode === 'login') {
+          await signInWithEmailAndPassword(auth, email, pass);
+          showToast('Berhasil masuk! Data jurnal tersinkronisasi.', 'success');
+        } else {
+          await createUserWithEmailAndPassword(auth, email, pass);
+          showToast('Akun baru berhasil dibuat!', 'success');
+        }
+      } catch (err) {
+        let msg = 'Periksa kembali email dan kata sandi Anda.';
+        if (err.code === 'auth/email-already-in-use') msg = 'Email sudah terdaftar. Silakan masuk melalui tab Masuk Akun.';
+        else if (err.code === 'auth/invalid-credential' || err.code === 'auth/wrong-password' || err.code === 'auth/user-not-found') {
+          msg = 'Email atau kata sandi salah. Jika belum memiliki akun, pilih tab Daftar Baru.';
+        }
+        errBox.textContent = msg;
+        errBox.classList.remove('hidden');
+      } finally {
+        btn.disabled = false;
+      }
+    };
+
+    window.handleGoogleLogin = async function() {
+      const errBox = document.getElementById('auth-error-box');
+      errBox.classList.add('hidden');
+      try {
+        await signInWithPopup(auth, new GoogleAuthProvider());
+        showToast('Berhasil masuk dengan Google!', 'success');
+      } catch (e) {
+        errBox.textContent = 'Login Google tidak tersedia di jendela ini. Silakan gunakan Email & Kata Sandi.';
+        errBox.classList.remove('hidden');
+      }
+    };
+
+    window.handleGuestLogin = async function() {
+      try {
+        await signInAnonymously(auth);
+        showToast('Masuk dalam mode cepat.', 'info');
+      } catch (e) {
+        showToast('Gagal masuk mode cepat.', 'error');
+      }
+    };
+
+    window.handleLogout = async function() {
+      try {
+        await signOut(auth);
+        journalEntries = [];
+        showToast('Anda telah keluar dari akun.', 'info');
+      } catch (e) {
+        showToast('Gagal keluar dari akun.', 'error');
+      }
+    };
+
+    // =====================================================================
+    // SINKRONISASI CLOUD FIRESTORE (STRICT PATHS & NO COMPLEX QUERIES)
+    // =====================================================================
+    function subscribeAllUserCollections(uid) {
+      if (!currentUser) return;
+
+      // 1. Profil: /artifacts/{appId}/users/{userId}/settings/profile
+      const profileRef = doc(db, 'artifacts', appId, 'users', uid, 'settings', 'profile');
+      unsubProfile = onSnapshot(
+        profileRef,
+        async (snap) => {
+          if (snap.exists()) {
+            userProfile = { ...DEFAULT_PROFILE, ...snap.data() };
+          } else {
+            userProfile = { ...DEFAULT_PROFILE };
+            try { await setDoc(profileRef, userProfile); } catch (e) {}
+          }
+          syncProfileToUI();
+          recalculateStatsAndDashboard();
+        },
+        (err) => {
+          console.error('Profile snapshot error:', err);
+        }
+      );
+
+      // 2. Penilaian Akhir: /artifacts/{appId}/users/{userId}/settings/evaluation
+      const evalRef = doc(db, 'artifacts', appId, 'users', uid, 'settings', 'evaluation');
+      unsubEval = onSnapshot(
+        evalRef,
+        async (snap) => {
+          if (snap.exists()) {
+            userEvaluation = { ...DEFAULT_EVALUATION, ...snap.data() };
+          } else {
+            userEvaluation = { ...DEFAULT_EVALUATION };
+            try { await setDoc(evalRef, userEvaluation); } catch (e) {}
+          }
+          syncEvaluationToUI();
+        },
+        (err) => {
+          console.error('Evaluation snapshot error:', err);
+        }
+      );
+
+      // 3. Jurnal Harian: /artifacts/{appId}/users/{userId}/entries
+      const entriesRef = collection(db, 'artifacts', appId, 'users', uid, 'entries');
+      unsubEntries = onSnapshot(
+        entriesRef,
+        async (snap) => {
+          if (snap.empty && !snap.metadata.hasPendingWrites) {
+            await seedInitialEntries(entriesRef);
+            return;
+          }
+          journalEntries = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+          updateMonthFilterOptions();
+          recalculateStatsAndDashboard();
+          renderRecentPreview();
+          renderLogbookList();
+        },
+        (err) => {
+          console.error('Entries snapshot error:', err);
+          showToast('Gagal memuat daftar jurnal dari cloud.', 'error');
+        }
+      );
+    }
+
+    async function seedInitialEntries(entriesRef) {
+      if (!currentUser) return;
+      try {
+        await addDoc(entriesRef, {
+          date: getOffsetDate(-1),
+          attendance: 'Hadir di Lokasi',
+          startTime: '08:00',
+          endTime: '16:00',
+          durationMinutes: 480,
+          division: 'Administrasi & Operasional',
+          title: 'Orientasi Lingkungan Kerja & Pengenalan SOP Divisi',
+          description: 'Mengikuti pengarahan dari pembimbing lapangan terkait tata tertib instansi, pengenalan alur surat-menyurat, dan penataan meja kerja.',
+          tools: 'Buku Panduan SOP, Komputer Kantor',
+          obstacle: 'Belum hafal kode pengarsipan divisi; diatasi dengan mencatat daftar kode map.',
+          skill: 'Memahami alur administrasi perkantoran dan etika kerja profesional.',
+          photoBase64: '',
+          approvalStatus: 'Diparaf Pembimbing Lapangan',
+          supervisorNote: 'Adaptasi sangat baik, tetap teliti dalam mencatat kode arsip.',
+          createdAt: Date.now() - 86400000
+        });
+      } catch (e) {
+        console.error('Seed error:', e);
+      }
+    }
+
+    // =====================================================================
+    // PERHITUNGAN DURASI JAM & STATISTIK DASHBOARD
+    // =====================================================================
+    function computeDurationMinutes(startStr, endStr, attendance) {
+      if (attendance === 'Izin' || attendance === 'Sakit') return 0;
+      if (!startStr || !endStr) return 0;
+      const [sh, sm] = startStr.split(':').map(Number);
+      const [eh, em] = endStr.split(':').map(Number);
+      const startTotal = sh * 60 + sm;
+      const endTotal = eh * 60 + em;
+      const diff = endTotal - startTotal;
+      return diff > 0 ? diff : 0;
+    }
+
+    function formatMinutesToText(totalMins) {
+      const hours = Math.floor(totalMins / 60);
+      const mins = totalMins % 60;
+      return `${hours} Jam ${mins} Menit`;
+    }
+
+    window.updateDurationPreview = function() {
+      const start = document.getElementById('f-start').value;
+      const end = document.getElementById('f-end').value;
+      const att = document.getElementById('f-attendance').value;
+      const mins = computeDurationMinutes(start, end, att);
+      const badge = document.getElementById('duration-preview-badge');
+      if (att === 'Izin' || att === 'Sakit') {
+        badge.textContent = '0 Jam (Status Izin/Sakit)';
+      } else {
+        badge.textContent = formatMinutesToText(mins);
+      }
+    };
+
+    function recalculateStatsAndDashboard() {
+      // Hitung hari unik berdasarkan status kehadiran
+      const hadirDates = new Set();
+      const izinDates = new Set();
+      let totalMinutes = 0;
+      let approvedCount = 0;
+      let pendingCount = 0;
+
+      journalEntries.forEach(item => {
+        if (item.attendance === 'Izin' || item.attendance === 'Sakit') {
+          if (item.date) izinDates.add(item.date);
+        } else {
+          if (item.date) hadirDates.add(item.date);
+          const mins = typeof item.durationMinutes === 'number'
+            ? item.durationMinutes
+            : computeDurationMinutes(item.startTime, item.endTime, item.attendance);
+          totalMinutes += mins;
+        }
+
+        if (item.approvalStatus === 'Diparaf Pembimbing Lapangan' || item.approvalStatus === 'Disahkan Guru Pembimbing') {
+          approvedCount++;
+        } else {
+          pendingCount++;
+        }
+      });
+
+      const hadirCount = hadirDates.size;
+      const izinCount = izinDates.size;
+      const targetDays = Math.max(1, Number(userProfile.targetDays) || 60);
+      const pct = Math.min(100, Math.round((hadirCount / targetDays) * 100));
+
+      document.getElementById('stat-hadir').textContent = hadirCount;
+      document.getElementById('stat-jam').textContent = `${Math.floor(totalMinutes / 60)}j`;
+      document.getElementById('stat-menit-sub').textContent = `${totalMinutes % 60} Menit (${formatMinutesToText(totalMinutes)})`;
+      document.getElementById('stat-approved').textContent = approvedCount;
+      document.getElementById('stat-pending').textContent = pendingCount;
+      document.getElementById('stat-izin').textContent = izinCount;
+
+      document.getElementById('progress-label-text').textContent = `${hadirCount} / ${targetDays} Hari Kerja (${pct}%)`;
+      document.getElementById('progress-bar-fill').style.width = `${pct}%`;
+      document.getElementById('dash-jam-text').textContent = formatMinutesToText(totalMinutes);
+
+      document.querySelectorAll('.badge-total-count').forEach(el => {
+        el.textContent = journalEntries.length;
+      });
+    }
+
+    // =====================================================================
+    // KOMPRESI FOTO OTOMATIS (HTML5 CANVAS < 120KB)
+    // =====================================================================
+    window.handlePhotoUpload = function(event) {
+      const file = event.target.files?.[0];
+      if (!file) return;
+
+      const statusEl = document.getElementById('photo-status-text');
+      statusEl.textContent = 'Mengompresi foto agar ringan...';
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const img = new Image();
+        img.onload = function() {
+          const canvas = document.createElement('canvas');
+          const MAX_DIM = 720;
+          let width = img.width;
+          let height = img.height;
+
+          if (width > height && width > MAX_DIM) {
+            height = Math.round((height * MAX_DIM) / width);
+            width = MAX_DIM;
+          } else if (height > MAX_DIM) {
+            width = Math.round((width * MAX_DIM) / height);
+            height = MAX_DIM;
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+
+          // Kompres bertahap hingga ukuran string < 115KB
+          let quality = 0.72;
+          let dataUrl = canvas.toDataURL('image/jpeg', quality);
+          while (dataUrl.length > 115000 && quality > 0.25) {
+            quality -= 0.12;
+            dataUrl = canvas.toDataURL('image/jpeg', quality);
+          }
+
+          currentPhotoBase64 = dataUrl;
+          const sizeKB = Math.round((dataUrl.length * 3) / 4 / 1024);
+          document.getElementById('photo-preview-img').src = dataUrl;
+          document.getElementById('photo-preview-wrapper').classList.remove('hidden');
+          statusEl.textContent = `Foto siap disimpan (${sizeKB} KB)`;
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    };
+
+    window.removeSelectedPhoto = function() {
+      currentPhotoBase64 = '';
+      document.getElementById('f-photo-input').value = '';
+      document.getElementById('photo-preview-img').src = '';
+      document.getElementById('photo-preview-wrapper').classList.add('hidden');
+      document.getElementById('photo-status-text').textContent = 'Belum ada foto dipilih';
+    };
+
+    // =====================================================================
+    // FORMULIR JURNAL HARIAN (SIMPAN, EDIT, CONTOH OTOMATIS)
+    // =====================================================================
+    window.fillExampleJournal = function() {
+      document.getElementById('f-date').value = getOffsetDate(0);
+      document.getElementById('f-attendance').value = 'Hadir di Lokasi';
+      document.getElementById('f-start').value = '08:00';
+      document.getElementById('f-end').value = '16:00';
+      document.getElementById('f-division').value = userProfile.divisi || 'Administrasi & Layanan Publik';
+      document.getElementById('f-title').value = 'Input & Verifikasi Dokumen Laporan Bulanan';
+      document.getElementById('f-desc').value = 'Melakukan pemeriksaan kelengkapan berkas masuk, memasukkan data transaksi harian ke sistem komputer, serta mencetak rekapitulasi untuk diperiksa oleh kepala divisi.';
+      document.getElementById('f-tools').value = 'Komputer Desktop, Microsoft Excel, Printer & Scanner';
+      document.getElementById('f-obstacle').value = 'Terdapat 2 berkas dengan nomor ganda; telah dikonfirmasi dan diperbaiki bersama pembimbing.';
+      document.getElementById('f-skill').value = 'Ketelitian verifikasi data dan penggunaan rumus rekapitulasi otomatis.';
+      updateDurationPreview();
+      showToast('Contoh pengisian otomatis telah dimasukkan ke formulir!', 'info');
+    };
+
+    window.handleJournalSubmit = async function(e) {
+      e.preventDefault();
+      if (!currentUser) return;
+
+      const id = document.getElementById('entry-id').value;
+      const date = document.getElementById('f-date').value;
+      const attendance = document.getElementById('f-attendance').value;
+      const startTime = document.getElementById('f-start').value;
+      const endTime = document.getElementById('f-end').value;
+      const division = document.getElementById('f-division').value.trim();
+      const title = document.getElementById('f-title').value.trim();
+      const description = document.getElementById('f-desc').value.trim();
+      const tools = document.getElementById('f-tools').value.trim();
+      const obstacle = document.getElementById('f-obstacle').value.trim();
+      const skill = document.getElementById('f-skill').value.trim();
+      const approvalStatus = document.getElementById('f-approval-status').value;
+      const supervisorNote = document.getElementById('f-supervisor-note').value.trim();
+      const durationMinutes = computeDurationMinutes(startTime, endTime, attendance);
+
+      const btn = document.getElementById('btn-save-journal');
+      btn.disabled = true;
+
+      const payload = {
+        date,
+        attendance,
+        startTime,
+        endTime,
+        durationMinutes,
+        division,
+        title,
+        description,
+        tools,
+        obstacle,
+        skill,
+        photoBase64: currentPhotoBase64,
+        approvalStatus,
+        supervisorNote
+      };
+
+      try {
+        if (id) {
+          const docRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'entries', id);
+          await updateDoc(docRef, payload);
+          showToast('Perubahan jurnal berhasil disimpan!', 'success');
+        } else {
+          const colRef = collection(db, 'artifacts', appId, 'users', currentUser.uid, 'entries');
+          await addDoc(colRef, { ...payload, createdAt: Date.now() });
+          showToast('Jurnal kegiatan baru berhasil disimpan ke cloud!', 'success');
+        }
+        resetJournalForm();
+      } catch (err) {
+        console.error('Save journal error:', err);
+        showToast('Gagal menyimpan jurnal. Periksa koneksi internet.', 'error');
+      } finally {
+        btn.disabled = false;
+      }
+    };
+
+    window.startEditJournal = function(id) {
+      const item = journalEntries.find(x => x.id === id);
+      if (!item) return;
+
+      switchTab('beranda');
+      document.getElementById('entry-id').value = item.id;
+      document.getElementById('f-date').value = item.date || getOffsetDate(0);
+      document.getElementById('f-attendance').value = item.attendance || 'Hadir di Lokasi';
+      document.getElementById('f-start').value = item.startTime || '08:00';
+      document.getElementById('f-end').value = item.endTime || '16:00';
+      document.getElementById('f-division').value = item.division || '';
+      document.getElementById('f-title').value = item.title || '';
+      document.getElementById('f-desc').value = item.description || '';
+      document.getElementById('f-tools').value = item.tools || '';
+      document.getElementById('f-obstacle').value = item.obstacle || '';
+      document.getElementById('f-skill').value = item.skill || '';
+      document.getElementById('f-approval-status').value = item.approvalStatus || 'Menunggu Paraf';
+      document.getElementById('f-supervisor-note').value = item.supervisorNote || '';
+
+      if (item.photoBase64) {
+        currentPhotoBase64 = item.photoBase64;
+        document.getElementById('photo-preview-img').src = item.photoBase64;
+        document.getElementById('photo-preview-wrapper').classList.remove('hidden');
+        document.getElementById('photo-status-text').textContent = 'Foto dokumentasi terlampir';
+      } else {
+        removeSelectedPhoto();
+      }
+
+      updateDurationPreview();
+      document.getElementById('form-heading').textContent = 'Ubah Catatan Jurnal';
+      document.getElementById('btn-save-journal-text').textContent = 'Simpan Perubahan Jurnal';
+      document.getElementById('btn-cancel-edit').classList.remove('hidden');
+
+      setTimeout(() => {
+        document.getElementById('journal-form-section').scrollIntoView({ behavior: 'smooth' });
+      }, 100);
+    };
+
+    window.resetJournalForm = function() {
+      document.getElementById('journal-form').reset();
+      document.getElementById('entry-id').value = '';
+      document.getElementById('f-date').value = getOffsetDate(0);
+      document.getElementById('f-attendance').value = 'Hadir di Lokasi';
+      document.getElementById('f-start').value = '08:00';
+      document.getElementById('f-end').value = '16:00';
+      document.getElementById('f-approval-status').value = 'Menunggu Paraf';
+      removeSelectedPhoto();
+      updateDurationPreview();
+
+      document.getElementById('form-heading').textContent = 'Catat Jurnal Kegiatan Harian';
+      document.getElementById('btn-save-journal-text').textContent = 'Simpan Jurnal Kegiatan';
+      document.getElementById('btn-cancel-edit').classList.add('hidden');
+    };
+
+    // =====================================================================
+    // RENDER KARTU RIWAYAT (LOGBOOK) & MODAL VERIFIKASI PEMBIMBING
+    // =====================================================================
+    function formatIndoDate(dateStr) {
+      if (!dateStr) return '-';
+      const [y, m, d] = dateStr.split('-').map(Number);
+      const dt = new Date(y, m - 1, d);
+      const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+      const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+      return `${days[dt.getDay()]}, ${d} ${months[dt.getMonth()]} ${y}`;
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      const d = document.createElement('div');
+      d.textContent = str;
+      return d.innerHTML;
+    }
+
+    function updateMonthFilterOptions() {
+      const sel = document.getElementById('filter-month');
+      const prev = sel.value;
+      const ymSet = new Set(journalEntries.map(x => (x.date || '').slice(0, 7)).filter(Boolean));
+      const sorted = Array.from(ymSet).sort().reverse();
+      const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+
+      sel.innerHTML = '<option value="ALL">Semua Bulan</option>';
+      sorted.forEach(ym => {
+        const [y, m] = ym.split('-').map(Number);
+        const opt = document.createElement('option');
+        opt.value = ym;
+        opt.textContent = `${months[m - 1]} ${y}`;
+        sel.appendChild(opt);
+      });
+      if (sorted.includes(prev)) sel.value = prev;
+    }
+
+    function getFilteredSortedEntries() {
+      const q = (document.getElementById('filter-search')?.value || '').trim().toLowerCase();
+      const appF = document.getElementById('filter-approval')?.value || 'ALL';
+      const attF = document.getElementById('filter-attendance')?.value || 'ALL';
+      const monF = document.getElementById('filter-month')?.value || 'ALL';
+      const sortF = document.getElementById('filter-sort')?.value || 'DESC';
+
+      return journalEntries
+        .filter(item => {
+          const matchQ = !q ||
+            (item.title || '').toLowerCase().includes(q) ||
+            (item.description || '').toLowerCase().includes(q) ||
+            (item.division || '').toLowerCase().includes(q) ||
+            (item.tools || '').toLowerCase().includes(q);
+          const matchApp = appF === 'ALL' || item.approvalStatus === appF;
+          const matchAtt = attF === 'ALL' || item.attendance === attF;
+          const matchMon = monF === 'ALL' || (item.date || '').startsWith(monF);
+          return matchQ && matchApp && matchAtt && matchMon;
+        })
+        .sort((a, b) => {
+          const cmp = (a.date || '').localeCompare(b.date || '') || (a.startTime || '').localeCompare(b.startTime || '');
+          return sortF === 'ASC' ? cmp : -cmp;
+        });
+    }
+
+    function buildEntryCardHTML(item) {
+      const mins = typeof item.durationMinutes === 'number'
+        ? item.durationMinutes
+        : computeDurationMinutes(item.startTime, item.endTime, item.attendance);
+
+      // Badge Kehadiran
+      let attBadge = 'bg-blue-100 text-blue-900 border-blue-200';
+      if (item.attendance === 'Daring/WFH') attBadge = 'bg-indigo-100 text-indigo-900 border-indigo-200';
+      else if (item.attendance === 'Izin' || item.attendance === 'Sakit') attBadge = 'bg-rose-100 text-rose-900 border-rose-200';
+
+      // Badge Paraf
+      let appBadge = 'bg-amber-100 text-amber-950 border-amber-300';
+      let appIcon = '⏳';
+      let borderCard = 'border-slate-200';
+      if (item.approvalStatus === 'Diparaf Pembimbing Lapangan') {
+        appBadge = 'bg-emerald-600 text-white border-emerald-700';
+        appIcon = '✔️';
+        borderCard = 'border-emerald-300';
+      } else if (item.approvalStatus === 'Disahkan Guru Pembimbing') {
+        appBadge = 'bg-navy-800 text-white border-navy-900';
+        appIcon = '🏅';
+        borderCard = 'border-navy-700';
+      }
+
+      const photoHtml = item.photoBase64
+        ? `<div class="mt-3">
+             <button type="button" onclick="openPhotoModal('${item.id}')"
+               class="inline-flex items-center gap-3 bg-slate-50 hover:bg-slate-100 border border-slate-300 rounded-2xl p-2 pr-4 transition cursor-pointer text-left">
+               <img src="${item.photoBase64}" alt="Foto Kegiatan" class="w-16 h-16 rounded-xl object-cover shrink-0">
+               <div>
+                 <span class="block text-xs font-extrabold text-primary-800">📷 Foto Dokumentasi</span>
+                 <span class="block text-xs text-slate-600">Ketuk untuk memperbesar foto</span>
+               </div>
+             </button>
+           </div>`
+        : '';
+
+      const noteHtml = item.supervisorNote
+        ? `<div class="mt-3 bg-emerald-50 border border-emerald-200 rounded-xl p-3 text-sm text-emerald-950">
+             <strong>💬 Catatan Pembimbing:</strong> ${escapeHtml(item.supervisorNote)}
+           </div>`
+        : '';
+
+      return `
+        <article class="bg-white border-2 ${borderCard} rounded-3xl p-5 sm:p-6 shadow-2xs space-y-3">
+          <!-- Baris Atas: Tanggal, Waktu & Status Paraf -->
+          <div class="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-slate-100">
+            <div class="flex flex-wrap items-center gap-2 text-xs sm:text-sm font-bold">
+              <span class="bg-slate-100 text-slate-800 px-3 py-1.5 rounded-xl">📅 ${formatIndoDate(item.date)}</span>
+              <span class="bg-slate-100 text-slate-700 px-3 py-1.5 rounded-xl">🕒 ${escapeHtml(item.startTime)} - ${escapeHtml(item.endTime)} (${formatMinutesToText(mins)})</span>
+              <span class="px-3 py-1.5 rounded-xl border ${attBadge}">${escapeHtml(item.attendance)}</span>
+            </div>
+            <span class="inline-flex items-center gap-1.5 text-xs sm:text-sm font-extrabold px-3.5 py-1.5 rounded-full border ${appBadge}">
+              ${appIcon} ${escapeHtml(item.approvalStatus || 'Menunggu Paraf')}
+            </span>
+          </div>
+
+          <!-- Judul & Uraian -->
+          <div>
+            ${item.division ? `<span class="text-xs font-extrabold uppercase tracking-wider text-primary-700">Divisi: ${escapeHtml(item.division)}</span>` : ''}
+            <h3 class="text-lg sm:text-xl font-extrabold text-slate-900 mt-0.5">${escapeHtml(item.title)}</h3>
+            <p class="text-sm sm:text-base text-slate-700 mt-2 leading-relaxed whitespace-pre-line">${escapeHtml(item.description)}</p>
+          </div>
+
+          <!-- Detail Tambahan (Alat, Kendala, Kompetensi) -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-2.5 pt-1 text-xs">
+            ${item.tools ? `<div class="bg-slate-50 border border-slate-200 rounded-xl p-2.5"><strong class="text-slate-800 block mb-0.5">🛠️ Alat/Aplikasi:</strong><span class="text-slate-700">${escapeHtml(item.tools)}</span></div>` : ''}
+            ${item.obstacle ? `<div class="bg-slate-50 border border-slate-200 rounded-xl p-2.5"><strong class="text-slate-800 block mb-0.5">⚠️ Kendala & Solusi:</strong><span class="text-slate-700">${escapeHtml(item.obstacle)}</span></div>` : ''}
+            ${item.skill ? `<div class="bg-slate-50 border border-slate-200 rounded-xl p-2.5"><strong class="text-slate-800 block mb-0.5">💡 Kompetensi Baru:</strong><span class="text-slate-700">${escapeHtml(item.skill)}</span></div>` : ''}
+          </div>
+
+          ${photoHtml}
+          ${noteHtml}
+
+          <!-- Tombol Aksi Cepat -->
+          <div class="pt-3 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+            <button type="button" onclick="openVerifyModal('${item.id}')"
+              class="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-sm px-4 py-3 rounded-xl shadow-2xs transition cursor-pointer">
+              <span>✍️ Paraf & Beri Catatan</span>
+            </button>
+
+            <div class="grid grid-cols-2 sm:flex items-center gap-2">
+              <button type="button" onclick="startEditJournal('${item.id}')"
+                class="inline-flex items-center justify-center gap-1.5 bg-blue-50 hover:bg-blue-100 text-blue-900 border border-blue-200 font-bold text-sm px-4 py-3 rounded-xl transition cursor-pointer">
+                <span>✏️ Edit</span>
+              </button>
+              <button type="button" onclick="openDeleteModal('${item.id}')"
+                class="inline-flex items-center justify-center gap-1.5 bg-rose-50 hover:bg-rose-100 text-rose-800 border border-rose-200 font-bold text-sm px-4 py-3 rounded-xl transition cursor-pointer">
+                <span>🗑️ Hapus</span>
+              </button>
+            </div>
+          </div>
+        </article>
+      `;
+    }
+
+    function renderRecentPreview() {
+      const container = document.getElementById('recent-entries-preview');
+      const sorted = [...journalEntries].sort((a, b) => (b.date || '').localeCompare(a.date || '')).slice(0, 3);
+      if (sorted.length === 0) {
+        container.innerHTML = `<p class="text-sm text-slate-500 text-center py-6 bg-slate-50 rounded-2xl border border-dashed border-slate-300">Belum ada catatan jurnal. Silakan isi formulir di atas.</p>`;
+        return;
+      }
+      container.innerHTML = sorted.map(buildEntryCardHTML).join('');
+    }
+
+    window.renderLogbookList = function() {
+      const container = document.getElementById('logbook-cards-container');
+      const list = getFilteredSortedEntries();
+      if (list.length === 0) {
+        container.innerHTML = `
+          <div class="bg-white border-2 border-dashed border-slate-300 rounded-3xl p-8 text-center">
+            <h3 class="text-lg font-extrabold text-slate-800">Tidak Ada Catatan Ditemukan</h3>
+            <p class="text-sm text-slate-600 mt-1">Coba ubah kata kunci pencarian atau filter status di atas.</p>
+          </div>
+        `;
+        return;
+      }
+      container.innerHTML = list.map(buildEntryCardHTML).join('');
+    };
+
+    // Modal Verifikasi Pembimbing
+    window.openVerifyModal = function(id) {
+      const item = journalEntries.find(x => x.id === id);
+      if (!item) return;
+      document.getElementById('verify-entry-id').value = item.id;
+      document.getElementById('verify-entry-date').textContent = `${formatIndoDate(item.date)} (${item.startTime} - ${item.endTime})`;
+      document.getElementById('verify-entry-title').textContent = item.title;
+      document.getElementById('verify-status-select').value = item.approvalStatus || 'Diparaf Pembimbing Lapangan';
+      document.getElementById('verify-note-input').value = item.supervisorNote || '';
+      document.getElementById('verify-modal').classList.remove('hidden');
+    };
+
+    window.closeVerifyModal = function() {
+      document.getElementById('verify-modal').classList.add('hidden');
+    };
+
+    window.submitSupervisorVerification = async function(e) {
+      e.preventDefault();
+      if (!currentUser) return;
+      const id = document.getElementById('verify-entry-id').value;
+      const approvalStatus = document.getElementById('verify-status-select').value;
+      const supervisorNote = document.getElementById('verify-note-input').value.trim();
+
+      try {
+        const docRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'entries', id);
+        await updateDoc(docRef, { approvalStatus, supervisorNote });
+        closeVerifyModal();
+        showToast('Status paraf & catatan pembimbing berhasil disimpan!', 'success');
+      } catch (err) {
+        showToast('Gagal menyimpan verifikasi pembimbing.', 'error');
+      }
+    };
+
+    // Modal Hapus
+    window.openDeleteModal = function(id) {
+      const item = journalEntries.find(x => x.id === id);
+      if (!item) return;
+      pendingDeleteId = id;
+      document.getElementById('delete-entry-title').textContent = item.title;
+      document.getElementById('delete-modal').classList.remove('hidden');
+    };
+
+    window.closeDeleteModal = function() {
+      pendingDeleteId = null;
+      document.getElementById('delete-modal').classList.add('hidden');
+    };
+
+    window.confirmDeleteEntry = async function() {
+      if (!currentUser || !pendingDeleteId) return;
+      try {
+        await deleteDoc(doc(db, 'artifacts', appId, 'users', currentUser.uid, 'entries', pendingDeleteId));
+        if (document.getElementById('entry-id').value === pendingDeleteId) resetJournalForm();
+        closeDeleteModal();
+        showToast('Catatan jurnal berhasil dihapus.', 'info');
+      } catch (e) {
+        showToast('Gagal menghapus catatan.', 'error');
+      }
+    };
+
+    // Modal Lightbox Foto
+    window.openPhotoModal = function(id) {
+      const item = journalEntries.find(x => x.id === id);
+      if (!item || !item.photoBase64) return;
+      document.getElementById('photo-modal-caption').textContent = `${item.title} (${formatIndoDate(item.date)})`;
+      document.getElementById('photo-modal-img').src = item.photoBase64;
+      document.getElementById('photo-modal').classList.remove('hidden');
+    };
+
+    window.closePhotoModal = function() {
+      document.getElementById('photo-modal').classList.add('hidden');
+    };
+
+    // =====================================================================
+    // PENILAIAN & EVALUASI AKHIR PKL
+    // =====================================================================
+    function getPredikatFromScore(score) {
+      const n = Number(score) || 0;
+      if (n >= 86) return 'Sangat Baik';
+      if (n >= 75) return 'Baik';
+      if (n >= 60) return 'Cukup';
+      return 'Perlu Pembinaan';
+    }
+
+    function syncEvaluationToUI() {
+      document.getElementById('eval-1').value = userEvaluation.disiplin ?? 90;
+      document.getElementById('eval-2').value = userEvaluation.tanggungJawab ?? 88;
+      document.getElementById('eval-3').value = userEvaluation.kerjasama ?? 92;
+      document.getElementById('eval-4').value = userEvaluation.inisiatif ?? 86;
+      document.getElementById('eval-5').value = userEvaluation.teknis ?? 89;
+      document.getElementById('eval-note').value = userEvaluation.catatanAkhir || '';
+      recalculateEvaluation();
+    }
+
+    window.recalculateEvaluation = function() {
+      const scores = [1, 2, 3, 4, 5].map(i => {
+        const val = Math.min(100, Math.max(0, Number(document.getElementById(`eval-${i}`).value) || 0));
+        document.getElementById(`eval-pred-${i}`).textContent = getPredikatFromScore(val);
+        return val;
+      });
+      const avg = scores.reduce((a, b) => a + b, 0) / 5;
+      document.getElementById('eval-avg-display').textContent = avg.toFixed(1);
+      document.getElementById('eval-predikat-badge').textContent = getPredikatFromScore(avg);
+    };
+
+    window.saveEvaluationData = async function(e) {
+      e.preventDefault();
+      if (!currentUser) return;
+
+      const updatedEval = {
+        disiplin: Number(document.getElementById('eval-1').value) || 0,
+        tanggungJawab: Number(document.getElementById('eval-2').value) || 0,
+        kerjasama: Number(document.getElementById('eval-3').value) || 0,
+        inisiatif: Number(document.getElementById('eval-4').value) || 0,
+        teknis: Number(document.getElementById('eval-5').value) || 0,
+        catatanAkhir: document.getElementById('eval-note').value.trim()
+      };
+
+      try {
+        const evalRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'settings', 'evaluation');
+        await setDoc(evalRef, updatedEval);
+        showToast('Penilaian akhir PKL berhasil disimpan ke cloud!', 'success');
+      } catch (err) {
+        showToast('Gagal menyimpan penilaian akhir.', 'error');
+      }
+    };
+
+    // =====================================================================
+    // PROFIL LENGKAP, CETAK LAPORAN RESMI, CSV, & BACKUP/RESTORE JSON
+    // =====================================================================
+    function syncProfileToUI() {
+      document.getElementById('dash-nama-siswa').textContent = userProfile.nama || '-';
+      document.getElementById('dash-sekolah-siswa').textContent = userProfile.sekolah || '-';
+      document.getElementById('dash-tempat-siswa').textContent = userProfile.perusahaan || '-';
+      document.getElementById('dash-periode-text').textContent = `${formatIndoDate(userProfile.startDate)} s.d. ${formatIndoDate(userProfile.endDate)}`;
+
+      document.getElementById('p-nama').value = userProfile.nama || '';
+      document.getElementById('p-nis').value = userProfile.nis || '';
+      document.getElementById('p-jurusan').value = userProfile.jurusan || '';
+      document.getElementById('p-sekolah').value = userProfile.sekolah || '';
+      document.getElementById('p-perusahaan').value = userProfile.perusahaan || '';
+      document.getElementById('p-divisi').value = userProfile.divisi || '';
+      document.getElementById('p-alamat').value = userProfile.alamat || '';
+      document.getElementById('p-start-date').value = userProfile.startDate || '';
+      document.getElementById('p-end-date').value = userProfile.endDate || '';
+      document.getElementById('p-target-days').value = userProfile.targetDays || 60;
+      document.getElementById('p-pembimbing-nama').value = userProfile.pembimbingNama || '';
+      document.getElementById('p-pembimbing-nip').value = userProfile.pembimbingNip || '';
+      document.getElementById('p-guru-nama').value = userProfile.guruNama || '';
+      document.getElementById('p-guru-nip').value = userProfile.guruNip || '';
+
+      if (!document.getElementById('f-division').value && userProfile.divisi) {
+        document.getElementById('f-division').value = userProfile.divisi;
+      }
+    }
+
+    window.saveFullProfile = async function(e) {
+      e.preventDefault();
+      if (!currentUser) return;
+
+      const updated = {
+        nama: document.getElementById('p-nama').value.trim(),
+        nis: document.getElementById('p-nis').value.trim(),
+        jurusan: document.getElementById('p-jurusan').value.trim(),
+        sekolah: document.getElementById('p-sekolah').value.trim(),
+        perusahaan: document.getElementById('p-perusahaan').value.trim(),
+        divisi: document.getElementById('p-divisi').value.trim(),
+        alamat: document.getElementById('p-alamat').value.trim(),
+        startDate: document.getElementById('p-start-date').value,
+        endDate: document.getElementById('p-end-date').value,
+        targetDays: Number(document.getElementById('p-target-days').value) || 60,
+        pembimbingNama: document.getElementById('p-pembimbing-nama').value.trim(),
+        pembimbingNip: document.getElementById('p-pembimbing-nip').value.trim(),
+        guruNama: document.getElementById('p-guru-nama').value.trim(),
+        guruNip: document.getElementById('p-guru-nip').value.trim()
+      };
+
+      try {
+        const profileRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'settings', 'profile');
+        await setDoc(profileRef, updated);
+        showToast('Seluruh data profil peserta & instansi berhasil diperbarui!', 'success');
+      } catch (err) {
+        showToast('Gagal menyimpan profil.', 'error');
+      }
+    };
+
+    window.generateOfficialPrintReport = function() {
+      // Bagian A: Identitas
+      document.getElementById('pr-header-sekolah').textContent = userProfile.sekolah || '-';
+      document.getElementById('pr-nama').textContent = userProfile.nama || '-';
+      document.getElementById('pr-nis').textContent = userProfile.nis || '-';
+      document.getElementById('pr-jurusan').textContent = userProfile.jurusan || '-';
+      document.getElementById('pr-sekolah').textContent = userProfile.sekolah || '-';
+      document.getElementById('pr-perusahaan').textContent = userProfile.perusahaan || '-';
+      document.getElementById('pr-alamat').textContent = userProfile.alamat || '-';
+      document.getElementById('pr-divisi').textContent = userProfile.divisi || '-';
+      document.getElementById('pr-periode').textContent = `${formatIndoDate(userProfile.startDate)} s.d. ${formatIndoDate(userProfile.endDate)}`;
+      document.getElementById('pr-pembimbing-lap').textContent = `${userProfile.pembimbingNama || '-'} (${userProfile.pembimbingNip || '-'})`;
+      document.getElementById('pr-guru-pemb').textContent = `${userProfile.guruNama || '-'} (${userProfile.guruNip || '-'})`;
+
+      // Bagian B: Rekap Kehadiran
+      const hadirDates = new Set();
+      const izinDates = new Set();
+      let totalMins = 0;
+      let approved = 0;
+      journalEntries.forEach(item => {
+        if (item.attendance === 'Izin' || item.attendance === 'Sakit') {
+          if (item.date) izinDates.add(item.date);
+        } else {
+          if (item.date) hadirDates.add(item.date);
+          totalMins += typeof item.durationMinutes === 'number'
+            ? item.durationMinutes
+            : computeDurationMinutes(item.startTime, item.endTime, item.attendance);
+        }
+        if (item.approvalStatus === 'Diparaf Pembimbing Lapangan' || item.approvalStatus === 'Disahkan Guru Pembimbing') {
+          approved++;
+        }
+      });
+
+      const targetDays = Number(userProfile.targetDays) || 60;
+      const pct = Math.min(100, Math.round((hadirDates.size / targetDays) * 100));
+      document.getElementById('pr-stat-target').textContent = `${targetDays} Hari`;
+      document.getElementById('pr-stat-hadir').textContent = `${hadirDates.size} Hari`;
+      document.getElementById('pr-stat-jam').textContent = formatMinutesToText(totalMins);
+      document.getElementById('pr-stat-izin').textContent = `${izinDates.size} Hari`;
+      document.getElementById('pr-stat-paraf').textContent = `${approved} / ${journalEntries.length} Jurnal`;
+      document.getElementById('pr-stat-persen').textContent = `${pct}%`;
+
+      // Bagian C: Tabel Jurnal Kronologis
+      const chrono = [...journalEntries].sort((a, b) => (a.date || '').localeCompare(b.date || '') || (a.startTime || '').localeCompare(b.startTime || ''));
+      document.getElementById('pr-filter-info').textContent = `Total ${chrono.length} Catatan Kegiatan`;
+
+      const tbody = document.getElementById('pr-journal-tbody');
+      if (chrono.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4">Belum ada catatan jurnal harian.</td></tr>';
+      } else {
+        tbody.innerHTML = chrono.map((item, idx) => `
+          <tr>
+            <td class="text-center">${idx + 1}</td>
+            <td>${formatIndoDate(item.date)}</td>
+            <td>
+              <strong>${escapeHtml(item.startTime)} - ${escapeHtml(item.endTime)}</strong><br>
+              <span>(${escapeHtml(item.attendance)})</span>
+            </td>
+            <td>
+              <strong>${escapeHtml(item.title)}</strong> <em>[${escapeHtml(item.division || '-')}]</em><br>
+              <span>${escapeHtml(item.description)}</span>
+              ${item.tools ? `<br><span class="text-slate-600">Alat: ${escapeHtml(item.tools)}</span>` : ''}
+              ${item.skill ? `<br><span class="text-slate-600">Kompetensi: ${escapeHtml(item.skill)}</span>` : ''}
+            </td>
+            <td>
+              <strong>${escapeHtml(item.approvalStatus || 'Menunggu Paraf')}</strong>
+              ${item.supervisorNote ? `<br><em>"${escapeHtml(item.supervisorNote)}"</em>` : ''}
+            </td>
+          </tr>
+        `).join('');
+      }
+
+      // Bagian D: Lembar Penilaian Akhir
+      const evalRows = [
+        { label: 'Disiplin & Kehadiran', score: userEvaluation.disiplin ?? 0 },
+        { label: 'Tanggung Jawab Pekerjaan', score: userEvaluation.tanggungJawab ?? 0 },
+        { label: 'Kerjasama Tim & Komunikasi', score: userEvaluation.kerjasama ?? 0 },
+        { label: 'Inisiatif & Kreativitas', score: userEvaluation.inisiatif ?? 0 },
+        { label: 'Keterampilan Teknis / Kejuruan', score: userEvaluation.teknis ?? 0 }
+      ];
+      document.getElementById('pr-eval-tbody').innerHTML = evalRows.map((r, i) => `
+        <tr>
+          <td class="text-center">${i + 1}</td>
+          <td>${r.label}</td>
+          <td class="text-center font-bold">${r.score}</td>
+          <td class="text-center">${getPredikatFromScore(r.score)}</td>
+        </tr>
+      `).join('');
+
+      const avgScore = evalRows.reduce((s, r) => s + Number(r.score), 0) / 5;
+      document.getElementById('pr-eval-avg').textContent = avgScore.toFixed(1);
+      document.getElementById('pr-eval-predikat').textContent = getPredikatFromScore(avgScore);
+      document.getElementById('pr-eval-note').textContent = userEvaluation.catatanAkhir || '-';
+
+      // Bagian E: 3 Tanda Tangan
+      document.getElementById('pr-ttd-guru-nama').textContent = `( ${userProfile.guruNama || '....................................'} )`;
+      document.getElementById('pr-ttd-guru-nip').textContent = `NIP/NIDN. ${userProfile.guruNip || '-'}`;
+      document.getElementById('pr-ttd-lap-nama').textContent = `( ${userProfile.pembimbingNama || '....................................'} )`;
+      document.getElementById('pr-ttd-lap-nip').textContent = `NIP/ID. ${userProfile.pembimbingNip || '-'}`;
+      document.getElementById('pr-ttd-siswa-nama').textContent = `( ${userProfile.nama || '....................................'} )`;
+      document.getElementById('pr-ttd-siswa-nis').textContent = `NIS/NIM. ${userProfile.nis || '-'}`;
+
+      window.print();
+    };
+
+    window.exportJournalCSV = function() {
+      if (journalEntries.length === 0) {
+        showToast('Belum ada data jurnal untuk diunduh.', 'error');
+        return;
+      }
+      const chrono = [...journalEntries].sort((a, b) => (a.date || '').localeCompare(b.date || ''));
+      const headers = [
+        'No', 'Tanggal', 'Status Kehadiran', 'Jam Masuk', 'Jam Pulang', 'Durasi (Menit)',
+        'Divisi', 'Judul Kegiatan', 'Uraian Detail', 'Alat/Aplikasi', 'Kendala & Solusi',
+        'Kompetensi Baru', 'Status Paraf', 'Catatan Pembimbing'
+      ];
+      const rows = chrono.map((it, idx) => [
+        idx + 1, it.date, it.attendance, it.startTime, it.endTime, it.durationMinutes || 0,
+        it.division, it.title, (it.description || '').replace(/\r?\n/g, ' '),
+        it.tools, it.obstacle, it.skill, it.approvalStatus, it.supervisorNote
+      ]);
+      const csv = [headers, ...rows]
+        .map(r => r.map(c => `"${String(c ?? '').replace(/"/g, '""')}"`).join(','))
+        .join('\n');
+
+      const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `Rekap_Jurnal_PKL_${(userProfile.nama || 'Peserta').replace(/\s+/g, '_')}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      showToast('File Excel (.CSV) berhasil diunduh!', 'success');
+    };
+
+    window.exportBackupJSON = function() {
+      const backupObj = {
+        exportedAt: new Date().toISOString(),
+        profile: userProfile,
+        evaluation: userEvaluation,
+        entries: journalEntries.map(({ id, ...rest }) => rest)
+      };
+      const blob = new Blob([JSON.stringify(backupObj, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `Backup_Jurnal_PKL_${getOffsetDate(0)}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      showToast('Cadangan data (.JSON) berhasil disimpan!', 'success');
+    };
+
+    window.importBackupJSON = function(event) {
+      const file = event.target.files?.[0];
+      if (!file || !currentUser) return;
+
+      const reader = new FileReader();
+      reader.onload = async function(e) {
+        try {
+          const parsed = JSON.parse(e.target.result);
+          if (parsed.profile) {
+            await setDoc(doc(db, 'artifacts', appId, 'users', currentUser.uid, 'settings', 'profile'), {
+              ...DEFAULT_PROFILE,
+              ...parsed.profile
+            });
+          }
+          if (parsed.evaluation) {
+            await setDoc(doc(db, 'artifacts', appId, 'users', currentUser.uid, 'settings', 'evaluation'), {
+              ...DEFAULT_EVALUATION,
+              ...parsed.evaluation
+            });
+          }
+          if (Array.isArray(parsed.entries)) {
+            const entriesRef = collection(db, 'artifacts', appId, 'users', currentUser.uid, 'entries');
+            for (const entry of parsed.entries) {
+              const { id, ...cleanEntry } = entry;
+              await addDoc(entriesRef, { ...cleanEntry, createdAt: cleanEntry.createdAt || Date.now() });
+            }
+          }
+          showToast('Data cadangan (.JSON) berhasil dipulihkan ke cloud!', 'success');
+        } catch (err) {
+          showToast('Format file cadangan JSON tidak valid.', 'error');
+        } finally {
+          event.target.value = '';
+        }
+      };
+      reader.readAsText(file);
+    };
+
+    // =====================================================================
+    // NOTIFIKASI TOAST
+    // =====================================================================
+    function showToast(msg, type = 'success') {
+      const container = document.getElementById('toast-container');
+      const div = document.createElement('div');
+      let style = 'bg-slate-900 text-white border-slate-700';
+      let icon = 'ℹ️';
+      if (type === 'success') { style = 'bg-emerald-800 text-white border-emerald-600'; icon = '✅'; }
+      else if (type === 'error') { style = 'bg-rose-800 text-white border-rose-600'; icon = '⚠️'; }
+
+      div.className = `toast-anim pointer-events-auto flex items-center gap-3 px-4 py-3.5 rounded-2xl border-2 shadow-xl text-sm font-bold ${style}`;
+      div.innerHTML = `<span class="text-lg shrink-0">${icon}</span><span>${escapeHtml(msg)}</span>`;
+      container.appendChild(div);
+      setTimeout(() => {
+        div.style.opacity = '0';
+        div.style.transition = 'opacity 0.25s ease';
+        setTimeout(() => div.remove(), 250);
+      }, 3200);
+    }
+  </script>
+</body>
+</html>
